@@ -41,17 +41,24 @@
    and masks .iwh-mesh; it only needs lifting above the bloom layer below. The
    weave itself is drawn by initMesh(), copied verbatim from script.js. */
 .iwc-hero .iwh-mesh { z-index: 1; }
-/* the copy sits above both background layers (the cloth and the bloom) */
-.iwc-hero-in { position: relative; z-index: 2; width: 100%; max-width: 1240px; margin: 0 auto; }
+/* The copy sits above both background layers (the cloth and the bloom), and
+   centres in the band the way the home hero's does. 900px is the measure that
+   still holds the one-line subtitle whole without letting the headline run
+   the full width of the band. */
+.iwc-hero-in {
+  position: relative; z-index: 2;
+  width: 100%; max-width: 900px; margin: 0 auto;
+  text-align: center;
+}
 
 /* the "Start a Project" kicker, arrow mark and all */
-.iwc-kicker { display: flex; align-items: center; gap: 10px; }
+.iwc-kicker { display: flex; align-items: center; justify-content: center; gap: 10px; }
 .iwc-kicker span {
   font-size: 12px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase;
   color: #80c34a;
 }
 .iwc-hero h1 {
-  margin: 20px 0 0; max-width: 940px;
+  margin: 20px auto 0; max-width: 940px;
   font-size: clamp(34px, 4.4vw, 50px); line-height: 1.10; font-weight: 800;
   letter-spacing: -1.6px; color: #fff;
   text-wrap: balance;
@@ -61,7 +68,7 @@
    Below 900px there isn't the width for it, so it goes back to a normal
    wrapping paragraph. */
 .iwc-hero-sub {
-  margin: 22px 0 0;
+  margin: 22px auto 0;
   white-space: nowrap;
   font-size: clamp(15px, 1.55vw, 19px); line-height: 1.6; font-weight: 500;
   color: rgba(226,238,252,.80);
@@ -69,13 +76,13 @@
 @media (max-width: 900px) {
   .iwc-hero-sub {
     white-space: normal; max-width: 640px;
-    font-size: 16.5px; text-wrap: pretty;
+    font-size: 16.5px; text-wrap: balance;
   }
 }
 
 /* CTA row: the booking link is the solid button, the jump-to-form is the
    hero's outlined treatment, so they don't compete */
-.iwc-hero-cta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-top: 36px; }
+.iwc-hero-cta { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 36px; }
 .iwc-btn-green {
   display: inline-flex; align-items: center; gap: 10px;
   height: 58px; padding: 0 34px;
@@ -103,12 +110,11 @@
    already in the footer (and the phone in the hero too), so the rail is gone
    and the form gets the width instead. */
 .iwc-main { position: relative; background: #f2f5f9; padding: 76px 40px 100px; }
-/* The container matches the hero's 1240px so both share one left edge; the card
-   inside stays 880px and hangs off that edge rather than centring in the page,
-   which left it floating out of line with the headline above. */
+/* The hero centres its copy, so the card centres under it — a left-hung card
+   below a centred headline reads as a mistake. */
 .iwc-col {
   max-width: 1240px; margin: 0 auto;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
 }
 .iwc-col > * { width: 100%; max-width: 880px; }
 
