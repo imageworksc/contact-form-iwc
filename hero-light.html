@@ -67,7 +67,7 @@
 .iwc-hero-in {
   position: relative; z-index: 2;
   width: 100%; max-width: 1240px; margin: 0 auto;
-  display: grid; grid-template-columns: 1.06fr .94fr; gap: 60px; align-items: center;
+  display: grid; grid-template-columns: 1.35fr .65fr; gap: 56px; align-items: center;
 }
 
 .iwc-kicker { display: flex; align-items: center; gap: 10px; }
@@ -115,57 +115,43 @@
 .iwc-hero-phone a { color: #143c66; font-weight: 700; text-decoration: none; }
 .iwc-hero-phone a:hover { text-decoration: underline; }
 
-/* ---------- the proof card ---------- */
+/* ---------- the proof card ----------
+   Deliberately small: it's a side note next to the ask, not a second headline.
+   It hugs the right edge of the grid so the copy keeps the open space. */
 .iwc-proofcard {
+  max-width: 372px; margin-left: auto;
   background: #fff;
   border: 1px solid #e6edf6; border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(20,40,80,.05), 0 20px 48px rgba(20,40,80,.11);
-  padding: 26px 30px 12px;
+  box-shadow: 0 1px 2px rgba(20,40,80,.05), 0 16px 38px rgba(20,40,80,.10);
+  padding: 19px 22px 9px;
 }
 .iwc-proofcard-h {
-  display: flex; align-items: center; gap: 11px;
-  padding-bottom: 20px; border-bottom: 1px solid #f0f4f9;
-  font-size: 12px; font-weight: 800; letter-spacing: 1.7px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 9px;
+  padding-bottom: 14px; border-bottom: 1px solid #f0f4f9;
+  font-size: 10.5px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
   color: #7d8ea1;
 }
 /* the window dots from the reference: two dead, the third live */
-.iwc-dots { display: flex; gap: 5px; }
-.iwc-dots i { width: 7px; height: 7px; border-radius: 50%; background: #dbe4ee; }
+.iwc-dots { display: flex; gap: 4px; }
+.iwc-dots i { width: 6px; height: 6px; border-radius: 50%; background: #dbe4ee; }
 .iwc-dots i:last-child { background: #80c34a; }
 
 .iwc-need {
-  display: flex; align-items: center; gap: 14px;
-  padding: 15px 0;
-  font-size: 16.5px; font-weight: 700; letter-spacing: -.2px; color: #143c66;
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 0;
+  font-size: 14px; font-weight: 700; letter-spacing: -.1px; color: #143c66;
   transition: transform .3s cubic-bezier(.2,.8,.3,1);
 }
 .iwc-need + .iwc-need { border-top: 1px solid #f2f6fa; }
 .iwc-need:hover { transform: translateX(4px); }
 .iwc-tick {
-  flex: none; width: 32px; height: 32px; border-radius: 9px;
+  flex: none; width: 24px; height: 24px; border-radius: 7px;
   background: #eef6e6; color: #4a8628;
   display: flex; align-items: center; justify-content: center;
   transition: background .3s ease, color .3s ease, transform .35s cubic-bezier(.2,.8,.3,1);
 }
+.iwc-tick svg { width: 13px; height: 13px; }
 .iwc-need:hover .iwc-tick { background: #80c34a; color: #fff; transform: scale(1.07); }
-
-/* ---------- the platform chips ---------- */
-.iwc-chips-label {
-  margin: 26px 0 12px;
-  font-size: 12px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase;
-  color: #9aa9bc;
-}
-.iwc-chips { display: flex; flex-wrap: wrap; gap: 9px; }
-.iwc-chip {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 9px 15px 9px 11px;
-  background: #fff; border: 1px solid #e6edf6; border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(20,40,80,.07);
-  font-size: 13.5px; font-weight: 700; color: #143c66;
-  transition: transform .3s cubic-bezier(.2,.8,.3,1), box-shadow .3s ease, border-color .3s ease;
-}
-.iwc-chip:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(20,40,80,.12); border-color: #d3e0ee; }
-.iwc-chip svg { flex: none; }
 
 /* ---------- body: one column, the form carrying the page ---------- */
 .iwc-main { position: relative; background: #f2f5f9; padding: 76px 40px 100px; }
@@ -281,7 +267,6 @@
 /* the card arrives after the copy, and its rows tick in one at a time */
 .iwc-proofcard  { animation: iwcUp .85s cubic-bezier(.16,.84,.44,1) .34s backwards; }
 .iwc-need       { animation: iwcUp .6s  cubic-bezier(.16,.84,.44,1) var(--d, 0s) backwards; }
-.iwc-chips-label, .iwc-chip { animation: iwcUp .6s cubic-bezier(.16,.84,.44,1) var(--d, 0s) backwards; }
 
 /* the kicker's arrow nudges forward once the line has landed */
 .iwc-kicker svg { animation: iwcNudge 3.4s ease-in-out 1.4s infinite; }
@@ -304,10 +289,10 @@
 /* ---------- responsive ---------- */
 @media (max-width: 1024px) {
   .iwc-hero { min-height: 0; }
-  .iwc-hero-in { grid-template-columns: 1fr; gap: 44px; }
+  .iwc-hero-in { grid-template-columns: 1fr; gap: 40px; }
   .iwc-hero-sub { max-width: 640px; }
-  .iwc-proofcard { max-width: 560px; }
-  .iwc-chips { max-width: 620px; }
+  /* stacked, it goes back to the left edge and stays small */
+  .iwc-proofcard { max-width: 420px; margin-left: 0; }
 }
 @media (max-width: 767px) {
   .iwc-hero { padding: 120px 24px 62px; }
@@ -316,8 +301,7 @@
   .iwc-form-card { padding: 30px 22px 28px; }
   .iwc-form-card h2 { font-size: 25px; }
   .iwc-row2 { grid-template-columns: 1fr; gap: 0; }
-  .iwc-proofcard { padding: 22px 22px 8px; }
-  .iwc-need { font-size: 15.5px; gap: 12px; }
+  .iwc-proofcard { padding: 18px 20px 8px; }
   .iwc-hero-cta { flex-direction: column; align-items: stretch; gap: 12px; }
   .iwc-btn-green, .iwc-btn-ghost { justify-content: center; }
   .iwc-submit { width: 100%; justify-content: center; }
@@ -328,13 +312,13 @@
 @media (prefers-reduced-motion: reduce) {
   .iwc-hero::before,
   .iwc-kicker, .iwc-hero h1, .iwc-hero-sub, .iwc-hero-cta, .iwc-hero-phone,
-  .iwc-proofcard, .iwc-need, .iwc-chips-label, .iwc-chip,
+  .iwc-proofcard, .iwc-need,
   .iwc-kicker svg, .iwc-captcha { animation: none !important; }
   .iwc-anim { opacity: 1; transform: none; }
   .iw-reveal.in .iwc-anim { transition: none; }
   .iw-btn:hover svg, .iwc-btn-ghost:hover svg { transform: none; }
   .iwc-input:focus, .iwc-textarea:focus { transform: none; }
-  .iwc-need:hover, .iwc-chip:hover { transform: none; }
+  .iwc-need:hover { transform: none; }
   .iwc-need:hover .iwc-tick { transform: none; }
 }
 </style>
@@ -429,33 +413,6 @@
           <span class="iwc-tick"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></span>
           No Shortcuts
         </div>
-      </div>
-
-      <!-- NEW COPY — not from the original form. It echoes the home page's own
-           "built for Modern Search" line and its SEO + AIO service. Confirm the
-           claim before this goes live, or delete the label and the chips. -->
-      <p class="iwc-chips-label" style="--d:.86s">Built to be found on</p>
-      <div class="iwc-chips">
-        <span class="iwc-chip" style="--d:.90s">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a8628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>
-          ChatGPT
-        </span>
-        <span class="iwc-chip" style="--d:.96s">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1266b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2c.6 5.2 4.2 8.8 9.4 9.4-5.2.6-8.8 4.2-9.4 9.4-.6-5.2-4.2-8.8-9.4-9.4C7.8 10.8 11.4 7.2 12 2z"/></svg>
-          Gemini
-        </span>
-        <span class="iwc-chip" style="--d:1.02s">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#143c66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
-          Perplexity
-        </span>
-        <span class="iwc-chip" style="--d:1.08s">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1266b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.2" y1="16.2" x2="21" y2="21"/></svg>
-          Google Search
-        </span>
-        <span class="iwc-chip" style="--d:1.14s">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4a8628" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="2.6"/></svg>
-          Google Maps
-        </span>
       </div>
     </div>
 
