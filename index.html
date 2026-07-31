@@ -103,7 +103,14 @@
    already in the footer (and the phone in the hero too), so the rail is gone
    and the form gets the width instead. */
 .iwc-main { position: relative; background: #f2f5f9; padding: 76px 40px 100px; }
-.iwc-col { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+/* The container matches the hero's 1240px so both share one left edge; the card
+   inside stays 880px and hangs off that edge rather than centring in the page,
+   which left it floating out of line with the headline above. */
+.iwc-col {
+  max-width: 1240px; margin: 0 auto;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 20px;
+}
+.iwc-col > * { width: 100%; max-width: 880px; }
 
 /* card shell — same 2px corner, hairline and double shadow the home page's
    process panel uses */
