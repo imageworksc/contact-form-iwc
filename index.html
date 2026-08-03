@@ -38,66 +38,75 @@
     linear-gradient(165deg, #103f74 0%, #0b2c55 52%, #071a38 100%);
 }
 /* ---------- the background: their own work, in duotone ----------
-   Not a pattern — the portfolio itself. Three strips of the shots from the
-   home page's showcase drift past at different rates, desaturated and blended
-   to navy so they read as texture rather than as thumbnails you're meant to
-   study. The two sprite sheets are 2.9MB between them, so nothing is fetched
-   until the page is idle (see initShots) and never on a narrow screen or a
-   metered connection. */
+   Not a pattern — the portfolio itself. Seven columns of the shots from the
+   home page's showcase ride slowly up and down at their own rates, greyscaled
+   and blended to navy so they read as a wall of work seen through the dark
+   rather than as thumbnails you're meant to study. Columns rather than rows:
+   they flank the centred copy instead of running through it.
+
+   The two sprite sheets are 2.9MB between them, so nothing is fetched until
+   the page is idle (see initShots), and never on a narrow screen or a metered
+   connection. */
 .iwc-shots {
   position: absolute; inset: 0;
   z-index: 0;
   pointer-events: none;
+  overflow: hidden;
   /* keeps the duotone blend off the navy field underneath */
   isolation: isolate;
   opacity: 0;
   transition: opacity 1.4s ease;
-  /* the strips slide under the nav and into the form band, as the home's own
+  /* the wall slides under the nav and into the form band, as the home's own
      hero canvas does */
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 15%, #000 84%, transparent 100%);
-          mask-image: linear-gradient(180deg, transparent 0, #000 15%, #000 84%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 13%, #000 86%, transparent 100%);
+          mask-image: linear-gradient(180deg, transparent 0, #000 13%, #000 86%, transparent 100%);
 }
-.iwc-shots.is-on { opacity: .2; }
+.iwc-shots.is-on { opacity: .12; }
+
 /* the pointer offset — one plane, since it is one wall */
 .iwc-shots-in {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; justify-content: center; gap: 16px;
+  position: absolute; inset: -6% 0;
+  display: flex; justify-content: center; gap: 18px;
   transform: translate3d(calc(var(--mx, 0) * 6px), calc(var(--my, 0) * 6px), 0);
   transition: transform .7s cubic-bezier(.16,.84,.44,1);
   will-change: transform;
 }
 
-.iwc-strip {
-  display: flex; gap: 16px;
-  width: max-content;
+.iwc-col-strip {
+  flex: none;
+  display: flex; flex-direction: column; gap: 18px;
+  height: max-content;
   will-change: transform;
 }
-.iwc-strip--a { animation: iwcShotsL 78s linear infinite; }
-.iwc-strip--b { animation: iwcShotsR 96s linear infinite; }
-.iwc-strip--c { animation: iwcShotsL 112s linear infinite; }
-@keyframes iwcShotsL { from { transform: translateX(0); }    to { transform: translateX(-50%); } }
-@keyframes iwcShotsR { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+/* four cadences, alternating direction, so no two neighbours travel together */
+.iwc-col-strip--0 { animation: iwcRise 68s linear infinite; }
+.iwc-col-strip--1 { animation: iwcFall 92s linear infinite; }
+.iwc-col-strip--2 { animation: iwcRise 110s linear infinite; }
+.iwc-col-strip--3 { animation: iwcFall 78s linear infinite; }
+@keyframes iwcRise { from { transform: translateY(0); }    to { transform: translateY(-50%); } }
+@keyframes iwcFall { from { transform: translateY(-50%); } to { transform: translateY(0); } }
 
 .iwc-shot {
   flex: none;
-  width: 250px; height: 148px;
+  width: 236px; height: 148px;
   border-radius: 2px;
   background-size: 100% auto;
   background-repeat: no-repeat;
-  background-color: #0d2b4e;
-  /* flattened first, so the tint below has a clean luminance map to sit on */
-  filter: grayscale(1) contrast(1.06) brightness(.72);
+  background-color: #081f3a;
+  /* flattened and pulled well down, so the tint below has a dark, clean
+     luminance map to sit on */
+  filter: grayscale(1) contrast(1.12) brightness(.4);
 }
 /* nothing is requested until the layer is switched on */
 .iwc-shots.is-on .iwc-shot--s1 { background-image: url("https://imageworksc.github.io/imageworks-home/assets/work-sprite-1.png"); }
 .iwc-shots.is-on .iwc-shot--s2 { background-image: url("https://imageworksc.github.io/imageworks-home/assets/work-2.png"); }
 
 /* The duotone: hue and saturation from this plate, luminosity from the shots
-   underneath. Blending only reaches the strips because the layer isolates. */
+   underneath. Blending only reaches the wall because the layer isolates. */
 .iwc-shots::after {
   content: "";
   position: absolute; inset: 0;
-  background: linear-gradient(150deg, #1e78c6 0%, #17589c 46%, #103f74 100%);
+  background: linear-gradient(150deg, #14538f 0%, #103f74 48%, #0a2748 100%);
   mix-blend-mode: color;
   pointer-events: none;
 }
@@ -108,7 +117,7 @@
   position: absolute; left: 50%; top: 50%;
   width: 148%; height: 190%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse at center, rgba(8,28,54,.52) 0%, rgba(8,28,54,.26) 46%, rgba(8,28,54,0) 74%);
+  background: radial-gradient(ellipse at center, rgba(5,18,36,.7) 0%, rgba(5,18,36,.4) 46%, rgba(5,18,36,0) 76%);
   z-index: -1;
   pointer-events: none;
 }
@@ -358,7 +367,7 @@
    board stays drawn — routes, junctions and chips all hold. Only the pulses
    travelling it and the blink at the live junctions stop. */
 @media (prefers-reduced-motion: reduce) {
-  .iwc-strip,
+  .iwc-col-strip,
   .iwc-kicker, .iwc-hero h1, .iwc-hero-sub, .iwc-hero-cta, .iwc-hero-phone,
   .iwc-kicker svg, .iwc-captcha { animation: none !important; }
   .iwc-shots-in { transform: none !important; transition: none; }
@@ -404,14 +413,19 @@
 <!-- ===================== HERO ===================== -->
 <header id="top" data-hero class="iwc-hero">
 
-  <!-- Background: their own work, desaturated and tinted navy. The shots and
-       their sprite offsets are the eight from the home page's showcase. The
-       image files are only requested once the page is idle — see initShots. -->
+  <!-- Background: their own work, greyscaled and tinted navy, in columns that
+       ride past at four different rates. The shots and their sprite offsets are
+       the eight from the home page's showcase. The image files are only
+       requested once the page is idle — see initShots. -->
   <div class="iwc-shots" data-shots aria-hidden="true">
     <div class="iwc-shots-in">
-      <div class="iwc-strip iwc-strip--a"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span></div>
-      <div class="iwc-strip iwc-strip--b"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span></div>
-      <div class="iwc-strip iwc-strip--c"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span></div>
+      <div class="iwc-col-strip iwc-col-strip--0"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span></div>
+      <div class="iwc-col-strip iwc-col-strip--1"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span></div>
+      <div class="iwc-col-strip iwc-col-strip--2"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span></div>
+      <div class="iwc-col-strip iwc-col-strip--3"><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span></div>
+      <div class="iwc-col-strip iwc-col-strip--0"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span></div>
+      <div class="iwc-col-strip iwc-col-strip--1"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span></div>
+      <div class="iwc-col-strip iwc-col-strip--2"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span></div>
     </div>
   </div>
 
