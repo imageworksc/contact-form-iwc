@@ -82,7 +82,9 @@
 .hero::before {
   content: "";
   position: absolute;
-  inset: -10%;
+  /* the washes wander past the edges, so the layer overhangs the band and no
+     wash ever runs out of room and turns around against a visible boundary */
+  inset: -18%;
   z-index: -1;
   pointer-events: none;
   background-image:
@@ -90,28 +92,29 @@
     radial-gradient(closest-side circle, rgba(18,102,181,.18), rgba(18,102,181,0) 100%),
     radial-gradient(closest-side circle, rgba(46,140,214,.15), rgba(46,140,214,0) 100%);
   background-repeat: no-repeat;
-  background-position: 8% 6%, 88% 18%, 56% 104%;
-  background-size: 62% 88%, 70% 96%, 66% 82%;
-  animation: heroWash 46s ease-in-out infinite;
+  background-position: 6% 12%, 90% 16%, 54% 96%;
+  /* held still: letting the sizes breathe as well turned a drift into a pulse */
+  background-size: 66% 92%, 72% 98%, 68% 86%;
+  /* Two minutes for one circuit, and `linear` rather than eased. Three
+     waypoints with ease-in-out made each wash decelerate, stop and reverse —
+     legible as an animation. Six waypoints on a closed loop, taken at a
+     constant rate, read as three lights that simply wander. */
+  animation: heroWash 124s linear infinite;
 }
 @keyframes heroWash {
-  0%, 100% {
-    background-position: 8% 6%, 88% 18%, 56% 104%;
-    background-size: 62% 88%, 70% 96%, 66% 82%;
-  }
-  33% {
-    background-position: 22% 22%, 74% 4%, 38% 92%;
-    background-size: 74% 100%, 60% 84%, 76% 94%;
-  }
-  66% {
-    background-position: 2% 16%, 96% 30%, 68% 110%;
-    background-size: 66% 80%, 80% 104%, 60% 76%;
-  }
+  0%   { background-position:  6% 12%,  90% 16%,  54%  96%; }
+  17%  { background-position: 24%  2%,  72% 34%,  30%  88%; }
+  34%  { background-position: 44% 24%,  50%  6%,  62% 106%; }
+  50%  { background-position: 30% 38%,  26% 24%,  90%  84%; }
+  67%  { background-position:  8% 28%,  44%  2%,  70% 100%; }
+  84%  { background-position: -6% 14%,  76%  8%,  38%  92%; }
+  100% { background-position:  6% 12%,  90% 16%,  54%  96%; }
 }
 
-/* A sheen crossing the band, the way light moves over a surface. One linear
-   gradient, one background-position sweep — it never repeats visibly because
-   its clock and the washes' don't divide. */
+/* A sheen crossing the band, the way light moves over a surface. Faint and
+   slow — at any more than this it stops being the room's light and starts
+   being an effect. Its clock doesn't divide into the washes', so the pair
+   never visibly repeats. */
 .hero::after {
   content: "";
   position: absolute;
@@ -119,14 +122,14 @@
   z-index: -1;
   pointer-events: none;
   background-image: linear-gradient(102deg,
-    rgba(255,255,255,0) 34%, rgba(255,255,255,.62) 50%, rgba(255,255,255,0) 66%);
+    rgba(255,255,255,0) 30%, rgba(255,255,255,.34) 50%, rgba(255,255,255,0) 70%);
   background-repeat: no-repeat;
-  background-size: 220% 100%;
-  animation: heroSheen 19s ease-in-out infinite;
+  background-size: 260% 100%;
+  animation: heroSheen 47s ease-in-out infinite;
 }
 @keyframes heroSheen {
-  0%, 100% { background-position: 118% 0; }
-  50%      { background-position: -18% 0; }
+  0%, 100% { background-position: 124% 0; }
+  50%      { background-position: -24% 0; }
 }
 
 /* One column: the claim and the call, with the cloth open to the right of
