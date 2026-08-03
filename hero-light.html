@@ -174,10 +174,17 @@
   50%      { background-position: -24% 0; }
 }
 
-/* One column: the claim and the call, with the cloth open to the right of
-   them. The credentials that shared this band live under the form instead. */
+/* One column, sitting in the middle of the band — but the copy inside it stays
+   ragged right. Centred text at this size makes every line find its own axis
+   and the eye has to hunt for the start of each one; a centred *block* of
+   left-aligned copy reads as centred while every line still begins in the same
+   place. The measure is set to what the copy actually occupies, so the block's
+   optical centre lands on the band's. */
 .hero-inner { position: relative; text-align: left; }
 .hero-main {
+  width: 100%;
+  max-width: 680px;
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -303,10 +310,11 @@
    BODY — one column, the form carrying the page
    -------------------------------------------------------------------------- */
 .iwc-main { position: relative; background: #f2f5f9; padding: 76px 0 100px; }
-/* the same shell and gutter the hero uses, so both share one left edge */
+/* the same shell and gutter the hero uses, and centred to match the copy
+   block above it */
 .iwc-col {
   max-width: var(--shell); margin-inline: auto; padding-inline: var(--gutter);
-  display: flex; flex-direction: column; align-items: flex-start; gap: 20px;
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
 }
 .iwc-col > * { width: 100%; max-width: 880px; }
 
