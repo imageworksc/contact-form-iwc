@@ -73,42 +73,84 @@
   border-block: 1px solid var(--border);
 }
 
-/* ---------- the ground: washes of brand colour, slowly moving ----------
-   Three soft radial washes on one layer. Each is its own background layer, so
-   `background-position` and `background-size` can be keyframed per layer and
-   the three drift and breathe independently — no extra elements, no canvas,
-   nothing to repaint. Pale on purpose: on a white ground anything stronger
-   stops being light and starts being decoration. */
-.hero::before {
-  content: "";
+/* ---------- the ground: washes of brand colour, each on its own heading ----------
+   One element per wash, moved by transform.
+
+   This started as three background layers on a single pseudo-element, animated
+   with `background-position`. It barely moved, and the reason is worth keeping
+   here: a percentage background-position is not a distance, it is a fraction of
+   the *free space* between the image and its box. With each wash sized at ~70%
+   of the band, the free space is ~30%, so travelling "from 6% to 44%" moved it
+   about a tenth of the width — over two minutes, invisible.
+
+   Transforms have no such compression: a percentage there is a fraction of the
+   element itself, and it composites rather than repainting. Separate elements
+   also mean separate clocks and separate directions, which is the point — the
+   green runs one way, the blue the other, and they drift apart and back
+   together instead of sliding as one sheet.
+
+   Pale on purpose: on a white ground anything stronger stops reading as light
+   and starts reading as decoration. */
+.hero-wash {
   position: absolute;
-  /* the washes wander past the edges, so the layer overhangs the band and no
-     wash ever runs out of room and turns around against a visible boundary */
-  inset: -18%;
+  inset: 0;
   z-index: -1;
+  overflow: hidden;
   pointer-events: none;
-  background-image:
-    radial-gradient(closest-side circle, rgba(128,195,74,.22), rgba(128,195,74,0) 100%),
-    radial-gradient(closest-side circle, rgba(18,102,181,.18), rgba(18,102,181,0) 100%),
-    radial-gradient(closest-side circle, rgba(46,140,214,.15), rgba(46,140,214,0) 100%);
-  background-repeat: no-repeat;
-  background-position: 6% 12%, 90% 16%, 54% 96%;
-  /* held still: letting the sizes breathe as well turned a drift into a pulse */
-  background-size: 66% 92%, 72% 98%, 68% 86%;
-  /* Two minutes for one circuit, and `linear` rather than eased. Three
-     waypoints with ease-in-out made each wash decelerate, stop and reverse —
-     legible as an animation. Six waypoints on a closed loop, taken at a
-     constant rate, read as three lights that simply wander. */
-  animation: heroWash 124s linear infinite;
 }
-@keyframes heroWash {
-  0%   { background-position:  6% 12%,  90% 16%,  54%  96%; }
-  17%  { background-position: 24%  2%,  72% 34%,  30%  88%; }
-  34%  { background-position: 44% 24%,  50%  6%,  62% 106%; }
-  50%  { background-position: 30% 38%,  26% 24%,  90%  84%; }
-  67%  { background-position:  8% 28%,  44%  2%,  70% 100%; }
-  84%  { background-position: -6% 14%,  76%  8%,  38%  92%; }
-  100% { background-position:  6% 12%,  90% 16%,  54%  96%; }
+.hero-wash span {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  will-change: transform;
+}
+
+/* green: opens top-left, runs down and to the right */
+.hero-wash__g {
+  width: clamp(360px, 48vw, 760px);
+  left: -16%; top: -30%;
+  background: radial-gradient(closest-side circle, rgba(128,195,74,.30), rgba(128,195,74,0) 100%);
+  animation: washG 71s linear infinite;
+}
+/* brand blue: opens top-right, runs the other way — left and down */
+.hero-wash__b {
+  width: clamp(380px, 52vw, 820px);
+  right: -18%; top: -26%;
+  background: radial-gradient(closest-side circle, rgba(18,102,181,.26), rgba(18,102,181,0) 100%);
+  animation: washB 97s linear infinite;
+}
+/* sky: sits low and crosses beneath both, slowest of the three */
+.hero-wash__s {
+  width: clamp(340px, 46vw, 720px);
+  left: 34%; bottom: -40%;
+  background: radial-gradient(closest-side circle, rgba(46,140,214,.22), rgba(46,140,214,0) 100%);
+  animation: washS 127s linear infinite;
+}
+
+/* Closed loops at a constant rate. Two waypoints on an ease would decelerate,
+   stop and reverse, which reads as an animation looping; four waypoints that
+   come back round read as something wandering. The three periods share no
+   useful factor, so the arrangement takes hours to recur. */
+@keyframes washG {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(38%, 22%, 0); }
+  50%  { transform: translate3d(64%, 6%, 0); }
+  75%  { transform: translate3d(26%, -14%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes washB {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(-42%, 26%, 0); }
+  50%  { transform: translate3d(-70%, -8%, 0); }
+  75%  { transform: translate3d(-30%, -24%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes washS {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(-34%, -18%, 0); }
+  50%  { transform: translate3d(-58%, 10%, 0); }
+  75%  { transform: translate3d(-18%, 20%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 
 /* A sheen crossing the band, the way light moves over a surface. Faint and
@@ -388,7 +430,7 @@
 @media (prefers-reduced-motion: reduce) {
   /* the washes hold at their opening positions — the ground keeps its colour,
      it just stops moving. The sheen is motion by definition, so it goes. */
-  .hero::before { animation: none !important; }
+  .hero-wash span { animation: none !important; }
   .hero::after { display: none; }
   .hero-kicker svg, .iwc-captcha { animation: none !important; }
   .iwc-anim { opacity: 1; transform: none; }
@@ -438,10 +480,19 @@
 <!-- ===================== HERO — option B, light =====================
      Construction taken from the Custom Web Design page: white ground, a
      hairline top and bottom, the claim and call on the left. The ground is
-     three slow washes of brand colour with a sheen crossing them — all of it
-     in the stylesheet, on two pseudo-elements, so there is nothing to mark up
-     and nothing to script. -->
+     three washes of brand colour, each on its own clock and its own heading,
+     with a sheen crossing them. All CSS — nothing here is scripted. -->
 <section class="hero" id="top" aria-labelledby="hero-title">
+
+  <!-- one element per wash: they travel by transform, in different directions
+       and at different rates, so they drift apart and back together instead of
+       sliding as one sheet -->
+  <div class="hero-wash" aria-hidden="true">
+    <span class="hero-wash__g"></span>
+    <span class="hero-wash__b"></span>
+    <span class="hero-wash__s"></span>
+  </div>
+
   <div class="wrap hero-inner">
     <div class="hero-main">
 
