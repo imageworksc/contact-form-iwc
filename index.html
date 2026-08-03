@@ -63,13 +63,13 @@
 }
 .iwc-shots.is-on { opacity: .12; }
 
-/* the pointer offset — one plane, since it is one wall */
+/* No pointer parallax here. The columns are already travelling, and a second
+   motion tracking the cursor on top of them read as a judder — every
+   pointermove restarted the eased transition, so the wall lagged and snatched
+   instead of gliding. The wall moves on its own clock, full stop. */
 .iwc-shots-in {
   position: absolute; inset: -6% 0;
   display: flex; justify-content: center; gap: 18px;
-  transform: translate3d(calc(var(--mx, 0) * 6px), calc(var(--my, 0) * 6px), 0);
-  transition: transform .7s cubic-bezier(.16,.84,.44,1);
-  will-change: transform;
 }
 
 .iwc-col-strip {
@@ -364,13 +364,13 @@
 
 /* ---------- reduced motion ---------- */
 /* styles.css already neutralises .iw-reveal; these are this page's own. The
-   board stays drawn — routes, junctions and chips all hold. Only the pulses
-   travelling it and the blink at the live junctions stop. */
+   wall of work stays up and stays lit — the columns simply stop travelling.
+   Each one holds at the top of its doubled list, which still overfills the
+   band, so stopping them leaves no gaps. */
 @media (prefers-reduced-motion: reduce) {
   .iwc-col-strip,
   .iwc-kicker, .iwc-hero h1, .iwc-hero-sub, .iwc-hero-cta, .iwc-hero-phone,
   .iwc-kicker svg, .iwc-captcha { animation: none !important; }
-  .iwc-shots-in { transform: none !important; transition: none; }
   .iwc-anim { opacity: 1; transform: none; }
   .iw-reveal.in .iwc-anim { transition: none; }
   .iw-btn:hover svg, .iwc-btn-ghost:hover svg { transform: none; }
@@ -650,33 +650,6 @@
   }
 
   /* -----------------------------------------------------------
-     The hero's three background planes slide against the pointer,
-     each by a different amount, so the field reads as having depth
-     instead of just drifting. The planes' own float animations are
-     CSS; this only publishes where the pointer is, as a pair of
-     -1..1 numbers the transforms multiply by their own --depth.
-     ----------------------------------------------------------- */
-  function initParallax() {
-    var hero = document.querySelector('[data-hero]');
-    if (!hero || REDUCE) return;
-    // a coarse pointer has nothing to track, and the planes would only ever
-    // jump on tap — leave them to their float
-    if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
-
-    hero.addEventListener('pointermove', function (e) {
-      var r = hero.getBoundingClientRect();
-      if (!r.width || !r.height) return;
-      hero.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 2 - 1).toFixed(3));
-      hero.style.setProperty('--my', ((e.clientY - r.top) / r.height * 2 - 1).toFixed(3));
-    }, { passive: true });
-
-    hero.addEventListener('pointerleave', function () {
-      hero.style.setProperty('--mx', '0');
-      hero.style.setProperty('--my', '0');
-    }, { passive: true });
-  }
-
-  /* -----------------------------------------------------------
      The wall of work is decoration sitting on 2.9MB of sprite
      sheets. Switching the layer on is what puts the URLs into
      the stylesheet's matched rules, so nothing is requested
@@ -700,7 +673,7 @@
     else window.addEventListener('load', on, { once: true });
   }
 
-  function boot() { initNav(); initReveal(); initParallax(); initShots(); }
+  function boot() { initNav(); initReveal(); initShots(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 })();
