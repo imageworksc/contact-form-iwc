@@ -37,117 +37,81 @@
     radial-gradient(100% 80% at 50% 122%, rgba(5,16,33,.55) 0%, rgba(5,16,33,0) 62%),
     linear-gradient(165deg, #103f74 0%, #0b2c55 52%, #071a38 100%);
 }
-/* ---------- the background: light, then shapes ----------
-   Three planes, each drifting at its own rate, and all three sliding a little
-   against the pointer so the field has depth rather than just movement:
-     0  the aura — big soft colour, no edges
-     1  far shapes — thin outlines, slow
-     2  near shapes — brighter, faster, more parallax
-   Everything is a gradient or a border. No canvas, so nothing to repaint. */
-.iwc-aura, .iwc-plane {
+/* ---------- the background: a routed schematic ----------
+   The brand's own visual language is structural, not atmospheric: the home
+   page draws a page's structure as blocks on a spine with dashed runs feeding
+   them. This is that, spread across the hero — routes with square corners,
+   junction nodes, a few structure chips sitting inline, and a pulse that
+   travels each route the way the home's dashed flows do. One inline SVG, two
+   CSS animations, nothing repainted.
+
+   The routes run edge to edge rather than dodging the copy; the well behind
+   the headline is what keeps them off it, exactly as the weave was handled. */
+.iwc-circuit {
   position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  z-index: 0;
   pointer-events: none;
-  /* the pointer offset lives here; the children carry their own float */
-  transform: translate3d(calc(var(--mx, 0) * var(--depth) * 1px),
-                         calc(var(--my, 0) * var(--depth) * 1px), 0);
+  /* the pointer offset — the routes shift as one plane, since a schematic
+     that parallaxes against itself stops reading as one board */
+  transform: translate3d(calc(var(--mx, 0) * 9px), calc(var(--my, 0) * 9px), 0);
   transition: transform .7s cubic-bezier(.16,.84,.44,1);
   will-change: transform;
 }
-.iwc-aura { z-index: 0; --depth: 7; }
-.iwc-plane--far  { z-index: 1; --depth: 16; }
-.iwc-plane--near { z-index: 1; --depth: 32; }
 
-/* --- the aura: three lobes of colour, each on its own long orbit --- */
-.iwc-blob {
-  position: absolute;
-  width: clamp(320px, 48vw, 780px); aspect-ratio: 1;
-  border-radius: 50%;
-  will-change: transform;
+.iwc-trace {
+  fill: none;
+  stroke: rgba(168,206,242,.17);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.iwc-blob--green {
-  top: -22%; left: -12%;
-  background: radial-gradient(circle at 50% 50%, rgba(128,195,74,.30) 0%, rgba(128,195,74,0) 66%);
-  animation: iwcOrbitA 34s ease-in-out infinite;
+/* junctions: the site squares its corners, so these are squares */
+.iwc-node {
+  fill: rgba(10,35,66,.55);
+  stroke: rgba(168,206,242,.34);
+  stroke-width: 1.2;
 }
-.iwc-blob--sky {
-  top: 2%; right: -16%;
-  width: clamp(340px, 54vw, 880px);
-  background: radial-gradient(circle at 50% 50%, rgba(46,140,214,.34) 0%, rgba(46,140,214,0) 64%);
-  animation: iwcOrbitB 44s ease-in-out infinite;
+.iwc-node--live { stroke: rgba(128,195,74,.55); }
+/* the structure chips, echoing the meta/JSON blocks in the home's diagram */
+.iwc-chipblk {
+  fill: rgba(11,40,74,.55);
+  stroke: rgba(124,192,247,.26);
+  stroke-width: 1;
 }
-.iwc-blob--deep {
-  bottom: -34%; left: 26%;
-  background: radial-gradient(circle at 50% 50%, rgba(24,88,168,.32) 0%, rgba(24,88,168,0) 66%);
-  animation: iwcOrbitC 38s ease-in-out infinite;
-}
-@keyframes iwcOrbitA {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  50%      { transform: translate(9%, 12%) scale(1.14); }
-}
-@keyframes iwcOrbitB {
-  0%, 100% { transform: translate(0, 0) scale(1.04); }
-  50%      { transform: translate(-11%, 9%) scale(.9); }
-}
-@keyframes iwcOrbitC {
-  0%, 100% { transform: translate(0, 0) scale(.96); }
-  50%      { transform: translate(7%, -13%) scale(1.12); }
-}
+.iwc-chipblk--green { stroke: rgba(128,195,74,.34); }
 
-/* --- the shapes: outlines, mostly. A filled shape at this size reads as a
-       blot; a 1.5px edge reads as an object catching the light. --- */
-.iwc-sh { position: absolute; will-change: transform; }
-.iwc-sh--ring {
-  border-radius: 50%;
-  border: 1.5px solid rgba(168,206,242,.22);
+/* A short bright dash travelling the whole route: one long gap, one short
+   mark, and the offset wound from the far end back to zero. */
+.iwc-pulse {
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 78 3000;
+  animation: iwcRun linear infinite;
 }
-.iwc-sh--sq {
-  /* 2px, because that is the corner the whole site squares off at */
-  border-radius: 2px;
-  border: 1.5px solid rgba(128,195,74,.26);
+@keyframes iwcRun {
+  from { stroke-dashoffset: 3078; }
+  to   { stroke-dashoffset: 0; }
 }
-.iwc-sh--disc {
-  border-radius: 50%;
-  background: radial-gradient(circle at 34% 32%, rgba(255,255,255,.14), rgba(128,195,74,.10) 52%, rgba(128,195,74,0) 74%);
-  box-shadow: inset 0 0 0 1px rgba(128,195,74,.22);
-}
-.iwc-sh--dot {
-  border-radius: 50%;
-  background: #80c34a;
-  box-shadow: 0 0 0 5px rgba(128,195,74,.12), 0 0 18px rgba(128,195,74,.5);
-}
-.iwc-sh--dot.is-blue {
-  background: #7cc0f7;
-  box-shadow: 0 0 0 5px rgba(124,192,247,.12), 0 0 18px rgba(124,192,247,.45);
-}
+.iwc-pulse--a { stroke: rgba(128,195,74,.62); animation-duration: 9s;  }
+.iwc-pulse--b { stroke: rgba(124,192,247,.55); animation-duration: 12s; animation-delay: 2.4s; }
+.iwc-pulse--c { stroke: rgba(128,195,74,.44); animation-duration: 14s; animation-delay: 6s;   }
+.iwc-pulse--d { stroke: rgba(124,192,247,.42); animation-duration: 11s; animation-delay: 4.2s; }
 
-/* far plane */
-.iwc-sh--r1 { width: 230px; height: 230px; top: 12%;  left: 3%;   animation: iwcDriftA 26s ease-in-out infinite; }
-.iwc-sh--r2 { width: 132px; height: 132px; bottom: 12%; right: 8%; animation: iwcDriftB 31s ease-in-out infinite; }
-.iwc-sh--s1 { width: 96px;  height: 96px;  top: 20%;  right: 13%;  transform: rotate(17deg); animation: iwcSpinA 29s ease-in-out infinite; }
-/* near plane */
-.iwc-sh--d1 { width: 86px;  height: 86px;  bottom: 20%; left: 12%; animation: iwcDriftB 22s ease-in-out infinite; }
-.iwc-sh--s2 { width: 54px;  height: 54px;  bottom: 30%; right: 22%; transform: rotate(-13deg); animation: iwcSpinB 24s ease-in-out infinite; }
-.iwc-sh--p1 { width: 7px;   height: 7px;   top: 26%;  left: 20%;   animation: iwcDriftA 18s ease-in-out infinite; }
-.iwc-sh--p2 { width: 6px;   height: 6px;   top: 68%;  right: 27%;  animation: iwcDriftB 20s ease-in-out infinite; }
-.iwc-sh--p3 { width: 5px;   height: 5px;   top: 16%;  right: 33%;  animation: iwcDriftA 24s ease-in-out infinite; }
-
-@keyframes iwcDriftA {
-  0%, 100% { transform: translate(0, 0); }
-  50%      { transform: translate(14px, -22px); }
+/* The live junctions breathe, the way the home's station nodes do. The rule
+   has to reach the rects, not the group: scaling the <g> would swing the four
+   of them around its shared centre instead of each about its own. */
+.iwc-node--live rect {
+  transform-box: fill-box; transform-origin: center;
+  animation: iwcNode 4.2s ease-in-out infinite;
 }
-@keyframes iwcDriftB {
-  0%, 100% { transform: translate(0, 0); }
-  50%      { transform: translate(-18px, 18px); }
-}
-/* the squares carry a rotation, so their float has to restate it or they snap
-   back to 0deg the moment the animation takes over */
-@keyframes iwcSpinA {
-  0%, 100% { transform: translate(0, 0) rotate(17deg); }
-  50%      { transform: translate(-12px, 16px) rotate(27deg); }
-}
-@keyframes iwcSpinB {
-  0%, 100% { transform: translate(0, 0) rotate(-13deg); }
-  50%      { transform: translate(15px, -14px) rotate(-24deg); }
+.iwc-node--live rect:nth-child(2) { animation-delay: 1.1s; }
+.iwc-node--live rect:nth-child(3) { animation-delay: 2.2s; }
+.iwc-node--live rect:nth-child(4) { animation-delay: 3.3s; }
+@keyframes iwcNode {
+  0%, 100% { opacity: .5; transform: scale(1); }
+  50%      { opacity: 1;  transform: scale(1.35); }
 }
 
 /* a well of depth under the copy, the way the home hero holds its own contrast */
@@ -160,10 +124,9 @@
   z-index: -1;
   pointer-events: none;
 }
-/* The copy sits above all three background planes, and centres in the band the
-   way the home hero's does. 900px is the measure that
-   still holds the one-line subtitle whole without letting the headline run
-   the full width of the band. */
+/* The copy sits above the board and centres in the band the way the home
+   hero's does. 900px is the measure that still holds the one-line subtitle
+   whole without letting the headline run the full width of the band. */
 .iwc-hero-in {
   position: relative; z-index: 2;
   width: 100%; max-width: 900px; margin: 0 auto;
@@ -396,25 +359,24 @@
   .iwc-btn-green, .iwc-btn-ghost { justify-content: center; }
   .iwc-submit { width: 100%; justify-content: center; }
 }
-/* On a narrow screen the copy takes the middle, so the shapes that sat beside
-   it would sit behind it instead. The aura carries the hero on its own. */
+/* On a narrow screen the routes crowd behind the copy, so the board thins
+   out: the traces stay, the chips and the spur stubs go. */
 @media (max-width: 900px) {
-  .iwc-sh--r1, .iwc-sh--s1, .iwc-sh--p1, .iwc-sh--p3 { display: none; }
-  .iwc-sh--r2 { width: 96px; height: 96px; }
-  .iwc-sh--d1 { width: 60px; height: 60px; }
+  .iwc-chipblk { display: none; }
+  .iwc-trace { stroke-width: 1; }
 }
 
 /* ---------- reduced motion ---------- */
 /* styles.css already neutralises .iw-reveal; these are this page's own. The
-   shapes keep their resting positions — the field still has depth, it just
-   stops moving. */
+   board stays drawn — routes, junctions and chips all hold. Only the pulses
+   travelling it and the blink at the live junctions stop. */
 @media (prefers-reduced-motion: reduce) {
-  .iwc-blob, .iwc-sh,
+  .iwc-pulse, .iwc-node--live rect,
   .iwc-kicker, .iwc-hero h1, .iwc-hero-sub, .iwc-hero-cta, .iwc-hero-phone,
   .iwc-kicker svg, .iwc-captcha { animation: none !important; }
-  .iwc-aura, .iwc-plane { transform: none !important; transition: none; }
-  .iwc-sh--s1 { transform: rotate(17deg); }
-  .iwc-sh--s2 { transform: rotate(-13deg); }
+  /* without the running dash the pulse strokes would sit as static stubs */
+  .iwc-pulse { display: none; }
+  .iwc-circuit { transform: none !important; transition: none; }
   .iwc-anim { opacity: 1; transform: none; }
   .iw-reveal.in .iwc-anim { transition: none; }
   .iw-btn:hover svg, .iwc-btn-ghost:hover svg { transform: none; }
@@ -457,26 +419,64 @@
 <!-- ===================== HERO ===================== -->
 <header id="top" data-hero class="iwc-hero">
 
-  <!-- Background, three planes deep: colour with no edges, then outlined
-       shapes drifting at two different rates. All CSS — see the block at the
-       top of the stylesheet. -->
-  <div class="iwc-aura" aria-hidden="true">
-    <span class="iwc-blob iwc-blob--green"></span>
-    <span class="iwc-blob iwc-blob--sky"></span>
-    <span class="iwc-blob iwc-blob--deep"></span>
-  </div>
-  <div class="iwc-plane iwc-plane--far" aria-hidden="true">
-    <span class="iwc-sh iwc-sh--ring iwc-sh--r1"></span>
-    <span class="iwc-sh iwc-sh--ring iwc-sh--r2"></span>
-    <span class="iwc-sh iwc-sh--sq iwc-sh--s1"></span>
-  </div>
-  <div class="iwc-plane iwc-plane--near" aria-hidden="true">
-    <span class="iwc-sh iwc-sh--disc iwc-sh--d1"></span>
-    <span class="iwc-sh iwc-sh--sq iwc-sh--s2"></span>
-    <span class="iwc-sh iwc-sh--dot iwc-sh--p1"></span>
-    <span class="iwc-sh iwc-sh--dot is-blue iwc-sh--p2"></span>
-    <span class="iwc-sh iwc-sh--dot iwc-sh--p3"></span>
-  </div>
+  <!-- Background: the page's structure, routed. Traces with square corners,
+       junction nodes, three structure chips, and a pulse running each route.
+       Styled in the block at the top of the stylesheet. -->
+  <svg class="iwc-circuit" viewBox="0 0 1440 620" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    <defs>
+      <path id="iwcR1" d="M-40 104 H 286 L 346 164 H 706 L 766 104 H 1168 L 1228 164 H 1480"/>
+      <path id="iwcR2" d="M-40 232 H 168 L 228 292 H 548 L 608 232 H 902"/>
+      <path id="iwcR3" d="M1480 268 H 1244 L 1184 328 H 868"/>
+      <path id="iwcR4" d="M-40 402 H 112 L 192 482 H 566 L 626 422 H 940 L 1000 482 H 1480"/>
+      <path id="iwcR5" d="M-40 546 H 268 L 328 486 H 654"/>
+      <path id="iwcR6" d="M1480 566 H 1112 L 1052 506 H 806"/>
+    </defs>
+
+    <g class="iwc-trace">
+      <use href="#iwcR1"/><use href="#iwcR2"/><use href="#iwcR3"/>
+      <use href="#iwcR4"/><use href="#iwcR5"/><use href="#iwcR6"/>
+      <!-- stubs: a board has spurs that go nowhere in particular -->
+      <path d="M1020 104 V 214 H 1088"/>
+      <path d="M286 292 V 402"/>
+      <path d="M706 164 V 232"/>
+      <path d="M626 422 V 486"/>
+    </g>
+
+    <g>
+      <use class="iwc-pulse iwc-pulse--a" href="#iwcR1"/>
+      <use class="iwc-pulse iwc-pulse--b" href="#iwcR4"/>
+      <use class="iwc-pulse iwc-pulse--c" href="#iwcR2"/>
+      <use class="iwc-pulse iwc-pulse--d" href="#iwcR6"/>
+    </g>
+
+    <g class="iwc-node">
+      <rect x="282" y="100" width="8" height="8" rx="1"/>
+      <rect x="702" y="160" width="8" height="8" rx="1"/>
+      <rect x="1164" y="100" width="8" height="8" rx="1"/>
+      <rect x="224" y="288" width="8" height="8" rx="1"/>
+      <rect x="1180" y="324" width="8" height="8" rx="1"/>
+      <rect x="188" y="478" width="8" height="8" rx="1"/>
+      <rect x="622" y="418" width="8" height="8" rx="1"/>
+      <rect x="1048" y="502" width="8" height="8" rx="1"/>
+      <rect x="1084" y="210" width="8" height="8" rx="1"/>
+    </g>
+    <g class="iwc-node iwc-node--live">
+      <rect x="342" y="160" width="9" height="9" rx="1"/>
+      <rect x="604" y="228" width="9" height="9" rx="1"/>
+      <rect x="996" y="478" width="9" height="9" rx="1"/>
+      <rect x="324" y="482" width="9" height="9" rx="1"/>
+    </g>
+
+    <!-- structure chips: the meta and JSON blocks of the home's diagram, at
+         the scale of a backdrop -->
+    <g>
+      <rect class="iwc-chipblk" x="392" y="153" width="74" height="22" rx="2"/>
+      <rect class="iwc-chipblk iwc-chipblk--green" x="1244" y="153" width="58" height="22" rx="2"/>
+      <rect class="iwc-chipblk" x="264" y="281" width="66" height="22" rx="2"/>
+      <rect class="iwc-chipblk iwc-chipblk--green" x="238" y="471" width="70" height="22" rx="2"/>
+      <rect class="iwc-chipblk" x="1036" y="555" width="62" height="22" rx="2"/>
+    </g>
+  </svg>
 
   <div class="iwc-hero-in">
 
