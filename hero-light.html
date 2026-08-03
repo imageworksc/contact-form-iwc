@@ -57,20 +57,37 @@
 /* --------------------------------------------------------------------------
    HERO — same construction as the home's, inverted to a light ground
    -------------------------------------------------------------------------- */
-.hero {
+/* --------------------------------------------------------------------------
+   THE GROUND — hero and form on one surface
+   There is no rule under the hero and no second band beneath it. Both sections
+   stand on this one element, which carries a single pale gradient down through
+   the pair: white where the headline sits, settling into the #f2f5f9 the form
+   band used to declare for itself. Because it is one gradient over the whole
+   height, there is no edge anywhere to read as a seam.
+   -------------------------------------------------------------------------- */
+.ground {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(180deg,
+    #ffffff 0%,
+    #fdfeff 22%,
+    #f8fbfe 44%,
+    #f4f7fb 64%,
+    #f2f5f9 82%);
+}
+
+.hero {
+  position: relative;
   display: flex;
   align-items: center;
-  overflow: hidden;
   /* enough height to hold the fold without pushing the form off it. The nav is
      absolutely positioned over this page, so its 72px is added to the top pad
      rather than being taken out of the copy's space. */
   min-height: min(72vh, 600px);
   padding-block: calc(var(--nav-h) + clamp(56px, 6vw, 84px)) clamp(56px, 6vw, 84px);
-  background: var(--white);
-  /* the ground runs to the edge and a hairline states where the block stops */
-  border-block: 1px solid var(--border);
+  /* no background and no border: the ground shows through */
+  background: none;
 }
 
 /* ---------- the ground: washes of brand colour, each on its own heading ----------
@@ -91,12 +108,20 @@
 
    Pale on purpose: on a white ground anything stronger stops reading as light
    and starts reading as decoration. */
+/* The washes belong to the ground, not to the hero, so they carry past the
+   hero's last line and dissolve well inside the form band. That crossing is
+   what makes the two sections read as one surface: the colour doesn't stop
+   where the copy does. Fixed height rather than inset:0, because the ground is
+   as tall as the form and washes spread over all of it would go flat. */
 .hero-wash {
   position: absolute;
-  inset: 0;
+  top: 0; left: 0; right: 0;
+  height: clamp(760px, 108vh, 1180px);
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 54%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0, #000 54%, transparent 100%);
 }
 .hero-wash span {
   position: absolute;
@@ -153,15 +178,18 @@
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* A sheen crossing the band, the way light moves over a surface. Faint and
-   slow — at any more than this it stops being the room's light and starts
-   being an effect. Its clock doesn't divide into the washes', so the pair
-   never visibly repeats. */
-.hero::after {
+/* A sheen crossing the surface, the way light moves over one. Faint and slow —
+   at any more than this it stops being the room's light and starts being an
+   effect. Its clock doesn't divide into the washes', so the pair never visibly
+   repeats.
+
+   It rides inside the wash layer rather than on the hero: on the hero its
+   bottom edge would cut a faint diagonal across the seam, whereas here it
+   fades out under the same mask as everything else. */
+.hero-wash::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
   pointer-events: none;
   background-image: linear-gradient(102deg,
     rgba(255,255,255,0) 30%, rgba(255,255,255,.34) 50%, rgba(255,255,255,0) 70%);
@@ -313,7 +341,9 @@
 /* --------------------------------------------------------------------------
    BODY — one column, the form carrying the page
    -------------------------------------------------------------------------- */
-.iwc-main { position: relative; background: #f2f5f9; padding: 76px 0 100px; }
+/* no background of its own — it stands on .ground, which is what removes the
+   band edge that used to sit under the hero */
+.iwc-main { position: relative; padding: 76px 0 100px; }
 /* the same shell and gutter the hero uses, and centred to match the copy
    block above it */
 .iwc-col {
@@ -443,7 +473,7 @@
   /* the washes hold at their opening positions — the ground keeps its colour,
      it just stops moving. The sheen is motion by definition, so it goes. */
   .hero-wash span { animation: none !important; }
-  .hero::after { display: none; }
+  .hero-wash::after { display: none; }
   .hero-kicker svg, .iwc-captcha { animation: none !important; }
   .iwc-anim { opacity: 1; transform: none; }
   .iw-reveal.in .iwc-anim { transition: none; }
@@ -489,12 +519,11 @@
   </button>
 </nav>
 
-<!-- ===================== HERO — option B, light =====================
-     Construction taken from the Custom Web Design page: white ground, a
-     hairline top and bottom, the claim and call on the left. The ground is
-     three washes of brand colour, each on its own clock and its own heading,
-     with a sheen crossing them. All CSS — nothing here is scripted. -->
-<section class="hero" id="top" aria-labelledby="hero-title">
+<!-- The hero and the form stand on one ground: a single pale gradient running
+     the height of both, with the three colour washes floating over it and
+     dissolving somewhere inside the form band. No rule between them, no change
+     of surface — the seam is only where the gradient happens to be. -->
+<div class="ground">
 
   <!-- one element per wash: they travel by transform, in different directions
        and at different rates, so they drift apart and back together instead of
@@ -505,6 +534,12 @@
     <span class="hero-wash__s"></span>
   </div>
 
+<!-- ===================== HERO — option B, light =====================
+     Construction taken from the Custom Web Design page: white ground, a
+     the claim and call on the left. There is no rule under it and no band
+     change: the hero and the form share one ground, and the washes carry
+     across the seam. See .ground in the stylesheet. -->
+<section class="hero" id="top" aria-labelledby="hero-title">
   <div class="wrap hero-inner">
     <div class="hero-main">
 
@@ -604,6 +639,7 @@
 
   </div>
 </main>
+</div>
 
 <!-- ===================== FOOTER (identical to the home page) ===================== -->
 <footer class="iw-footer" style="background:#0a2c4d;color:#fff;padding:104px 40px 0;">
