@@ -174,16 +174,20 @@
   50%      { background-position: -24% 0; }
 }
 
-/* One column, sitting in the middle of the band — but the copy inside it stays
-   ragged right. Centred text at this size makes every line find its own axis
-   and the eye has to hunt for the start of each one; a centred *block* of
-   left-aligned copy reads as centred while every line still begins in the same
-   place. The measure is set to what the copy actually occupies, so the block's
-   optical centre lands on the band's. */
+/* One column, centred in the band, with the copy inside it still ragged right.
+   Centred text at this size gives every line its own axis and the eye has to
+   hunt for each start; a centred *block* of left-aligned copy reads as centred
+   while every line keeps the same left edge.
+
+   That edge is set by the form card below: same 880px measure, same centring,
+   so the headline starts exactly where the card's first field label does. It
+   is a wider box than the copy needs, which is the trade — the words sit a
+   little left of the band's optical centre in exchange for the two blocks
+   lining up. */
 .hero-inner { position: relative; text-align: left; }
 .hero-main {
   width: 100%;
-  max-width: 680px;
+  max-width: 880px;
   margin-inline: auto;
   display: flex;
   flex-direction: column;
