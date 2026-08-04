@@ -84,10 +84,17 @@
   /* enough height to hold the fold without pushing the form off it. The nav is
      absolutely positioned over this page, so its 72px is added to the top pad
      rather than being taken out of the copy's space. */
-  min-height: min(72vh, 600px);
-  /* the foot is shorter than the head on purpose: with no rule and no band
-     change under it, a long tail of empty ground just pushed the form down */
-  padding-block: calc(var(--nav-h) + clamp(56px, 6vw, 84px)) clamp(34px, 3.6vw, 52px);
+  /* No floor. It used to be min(72vh, 600px), which was taller than the copy
+     needs now that both lines run whole — and with the content flex-centred,
+     any slack it forced came straight back as air above and below. The two
+     pads below decide the height on their own.
+
+     The head still carries the nav's 72px, since the nav is positioned over
+     this band rather than above it. The foot stays shorter than the head: with
+     no rule and no band change under it, a long tail of empty ground just
+     pushes the form away. */
+  min-height: 0;
+  padding-block: calc(var(--nav-h) + clamp(28px, 3vw, 44px)) clamp(20px, 2.2vw, 30px);
   /* no background and no border: the ground shows through */
   background: none;
 }
@@ -294,7 +301,6 @@
    the type going too small to read, so both go back to wrapping paragraphs
    with a measure. */
 @media (max-width: 900px) {
-  .hero { min-height: 0; }
   .hero h1 {
     white-space: normal;
     max-width: 20ch;
@@ -361,7 +367,7 @@
    -------------------------------------------------------------------------- */
 /* no background of its own — it stands on .ground, which is what removes the
    band edge that used to sit under the hero */
-.iwc-main { position: relative; padding: 48px 0 100px; }
+.iwc-main { position: relative; padding: 28px 0 100px; }
 /* the same shell and gutter the hero uses, and centred to match the copy
    block above it */
 .iwc-col {
