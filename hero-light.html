@@ -125,53 +125,65 @@
    what makes the two sections read as one surface: the colour doesn't stop
    where the copy does. Fixed height rather than inset:0, because the ground is
    as tall as the form and washes spread over all of it would go flat. */
+/* Vertically this layer is measured in pixels, not viewport units, and that is
+   the whole point of it.
+
+   It used to be 112vh tall with the washes sized in vw. But what it has to
+   line up with — the hero's copy, the card, the first row of fields — is a
+   stack of type and padding whose height barely changes with the screen. On a
+   taller or wider monitor the layer and the washes grew while the fields
+   stayed put, so the colour slid off them. Anything vertical here is therefore
+   in px and holds its position at every resolution.
+
+   The numbers, down from the top of the ground: the hero ends at ~451px, the
+   card opens at ~479, the Name / Company labels sit at ~620 and their inputs
+   end at ~696. The mask holds full strength to 700px so the whole first row is
+   covered, then dissolves by 1040.
+
+   Widths stay proportional — a wash should still span a wide band — which is
+   why the gradients below are ellipses rather than circles: the box is wide
+   and short, and `circle` would take its radius from the short side. */
 .hero-wash {
   position: absolute;
   top: 0; left: 0; right: 0;
-  /* Reaches the form's first row of fields. Measured down from the top of the
-     ground on a 1440x900 screen: the hero runs to about 446px, the card starts
-     at 474, and the Name / Company labels land near 615 with their inputs
-     ending around 700. The layer is 112vh so it clears that, and the mask
-     holds full strength to 66% — about 665px — before dissolving, so the
-     colour is still there at the first row and gone by the message field. */
-  height: clamp(880px, 112vh, 1240px);
+  height: 1040px;
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 66%, transparent 100%);
-          mask-image: linear-gradient(180deg, #000 0, #000 66%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 700px, transparent 1040px);
+          mask-image: linear-gradient(180deg, #000 0, #000 700px, transparent 1040px);
 }
+/* width scales with the band, height is fixed — see the note above */
 .hero-wash span {
   position: absolute;
-  aspect-ratio: 1;
-  border-radius: 50%;
   will-change: transform;
 }
 
 /* green: opens top-left, runs down and to the right */
 .hero-wash__g {
-  width: clamp(360px, 48vw, 760px);
-  left: -16%; top: -30%;
-  background: radial-gradient(closest-side circle, rgba(128,195,74,.30), rgba(128,195,74,0) 100%);
+  width: clamp(420px, 46vw, 880px);
+  height: 640px;
+  left: -14%; top: -220px;
+  background: radial-gradient(closest-side ellipse at center, rgba(128,195,74,.30), rgba(128,195,74,0) 100%);
   animation: washG 71s linear infinite;
 }
 /* brand blue: opens top-right, runs the other way — left and down */
 .hero-wash__b {
-  width: clamp(380px, 52vw, 820px);
-  right: -18%; top: -26%;
-  background: radial-gradient(closest-side circle, rgba(18,102,181,.26), rgba(18,102,181,0) 100%);
+  width: clamp(440px, 50vw, 940px);
+  height: 700px;
+  right: -16%; top: -190px;
+  background: radial-gradient(closest-side ellipse at center, rgba(18,102,181,.26), rgba(18,102,181,0) 100%);
   animation: washB 97s linear infinite;
 }
-/* Sky: the one that reaches the form. It used to hang off the bottom of the
-   layer, which put most of its body below the clip and left only a weak tail
-   in view. Anchored from the top instead, at 38% of the layer, it sits with
-   its centre around the card's opening and its body over the Name / Company
-   row — so there is real colour down there rather than the fading edge of
-   something else. Slowest of the three, and the widest. */
+/* Sky: the one that has to hold the first row of fields. Its centre is parked
+   at 630px — the Name / Company labels — and its own travel only carries that
+   centre between about 510 and 760, so the row is inside it at every point of
+   the loop. Slowest of the three, and the widest. */
 .hero-wash__s {
-  width: clamp(360px, 50vw, 780px);
-  left: 30%; top: 38%;
-  background: radial-gradient(closest-side circle, rgba(46,140,214,.26), rgba(46,140,214,0) 100%);
+  width: clamp(460px, 54vw, 1000px);
+  height: 660px;
+  left: 28%; top: 300px;
+  background: radial-gradient(closest-side ellipse at center, rgba(46,140,214,.26), rgba(46,140,214,0) 100%);
   animation: washS 127s linear infinite;
 }
 
@@ -315,6 +327,16 @@
    the type going too small to read, so both go back to wrapping paragraphs
    with a measure. */
 @media (max-width: 900px) {
+  /* Both lines wrap here and the buttons stack, so the copy is roughly 120px
+     taller and the first row of fields sits nearer 715px. The layer and its
+     mask move down to match — still px, still the same at every width. */
+  .hero-wash {
+    height: 1200px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0, #000 800px, transparent 1200px);
+            mask-image: linear-gradient(180deg, #000 0, #000 800px, transparent 1200px);
+  }
+  .hero-wash__s { top: 380px; }
+
   .hero h1 {
     white-space: normal;
     max-width: 20ch;
