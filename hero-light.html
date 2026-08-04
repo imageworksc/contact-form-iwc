@@ -231,27 +231,29 @@
   color: var(--green-ink);
 }
 
+/* Both lines run whole, so neither carries a measure any more — the type is
+   sized to fit the 880px block instead. The ceilings are what 29 and 85
+   characters of Plus Jakarta Sans ExtraBold / Medium actually occupy at that
+   width, with the headline's -.035em tracking counted in; below those the vw
+   term takes over and they shrink with the viewport rather than wrapping. */
 .hero h1 {
   margin: 0;
-  font-size: clamp(36px, 4.2vw + 8px, 64px);
+  font-size: clamp(26px, 4.4vw, 54px);
   line-height: 1.08;
   font-weight: 800;
   letter-spacing: -.035em;
   color: var(--navy);
-  /* a ragged left column reads faster than a wide centred block */
-  max-width: 16ch;
-  text-wrap: balance;
+  white-space: nowrap;
 }
 .hero h1 .accent { color: var(--green-ink); }
 
 .hero-sub {
   margin: 0;
-  font-size: clamp(16.5px, .55vw + 15px, 18.5px);
+  font-size: clamp(12.5px, 1.45vw, 17.5px);
   line-height: 1.65;
   font-weight: 500;
-  max-width: 52ch;
   color: var(--muted);
-  text-wrap: pretty;
+  white-space: nowrap;
 }
 
 .btn-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
@@ -288,9 +290,23 @@
 .hero-phone a { color: var(--navy); font-weight: 700; text-decoration: none; }
 .hero-phone a:hover { text-decoration: underline; }
 
+/* Below this there isn't the width to hold 85 characters on one line without
+   the type going too small to read, so both go back to wrapping paragraphs
+   with a measure. */
 @media (max-width: 900px) {
   .hero { min-height: 0; }
-  .hero h1 { max-width: 20ch; }
+  .hero h1 {
+    white-space: normal;
+    max-width: 20ch;
+    font-size: clamp(30px, 5.6vw, 42px);
+    text-wrap: balance;
+  }
+  .hero-sub {
+    white-space: normal;
+    max-width: 52ch;
+    font-size: 16.5px;
+    text-wrap: pretty;
+  }
 }
 
 /* ---------- the five proof points, in a band under the form ---------- */
