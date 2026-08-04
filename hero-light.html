@@ -153,36 +153,44 @@
   -webkit-mask-image: linear-gradient(180deg, #000 0, #000 700px, transparent 1040px);
           mask-image: linear-gradient(180deg, #000 0, #000 700px, transparent 1040px);
 }
-/* width scales with the band, height is fixed — see the note above */
+/* Fixed size, and placed from the centre line rather than from an edge.
+
+   Widths were still in vw and the offsets in %, so a wider screen stretched
+   each wash and pushed them apart — the same drift as before, along the other
+   axis. Every number here is px now, and `left: 50%` plus a px margin hangs
+   each one off the middle of the page. That is the right anchor because the
+   content is centred too: the shell, the copy block and the card all sit on
+   that line, so the washes keep their relationship to them at any width.
+
+   The offsets read as "how far the wash's left edge sits from the centre". */
 .hero-wash span {
   position: absolute;
+  left: 50%;
   will-change: transform;
 }
 
-/* green: opens top-left, runs down and to the right */
+/* green: opens top-left of the copy, runs down and to the right */
 .hero-wash__g {
-  width: clamp(420px, 46vw, 880px);
-  height: 640px;
-  left: -14%; top: -220px;
+  width: 780px; height: 640px;
+  margin-left: -870px; top: -220px;
   background: radial-gradient(closest-side ellipse at center, rgba(128,195,74,.30), rgba(128,195,74,0) 100%);
   animation: washG 71s linear infinite;
 }
 /* brand blue: opens top-right, runs the other way — left and down */
 .hero-wash__b {
-  width: clamp(440px, 50vw, 940px);
-  height: 700px;
-  right: -16%; top: -190px;
+  width: 840px; height: 700px;
+  margin-left: 50px; top: -190px;
   background: radial-gradient(closest-side ellipse at center, rgba(18,102,181,.26), rgba(18,102,181,0) 100%);
   animation: washB 97s linear infinite;
 }
 /* Sky: the one that has to hold the first row of fields. Its centre is parked
-   at 630px — the Name / Company labels — and its own travel only carries that
-   centre between about 510 and 760, so the row is inside it at every point of
-   the loop. Slowest of the three, and the widest. */
+   at 630px down — the Name / Company labels — and just right of the page's
+   centre line, over the Company column. Its own travel only carries that
+   centre between about 510 and 760 vertically, so the row is inside it at
+   every point of the loop. Slowest of the three, and the widest. */
 .hero-wash__s {
-  width: clamp(460px, 54vw, 1000px);
-  height: 660px;
-  left: 28%; top: 300px;
+  width: 900px; height: 660px;
+  margin-left: -410px; top: 300px;
   background: radial-gradient(closest-side ellipse at center, rgba(46,140,214,.26), rgba(46,140,214,0) 100%);
   animation: washS 127s linear infinite;
 }
