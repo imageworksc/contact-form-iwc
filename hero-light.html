@@ -94,7 +94,10 @@
      no rule and no band change under it, a long tail of empty ground just
      pushes the form away. */
   min-height: 0;
-  padding-block: calc(var(--nav-h) + clamp(28px, 3vw, 44px)) clamp(20px, 2.2vw, 30px);
+  /* +20px on the head. The vw term is retuned as well as the bounds — at 3vw
+     the preferred value fell below the new 48px floor and every viewport would
+     have clamped to it, so the head would have stopped growing with the page. */
+  padding-block: calc(var(--nav-h) + clamp(48px, 4.4vw, 64px)) clamp(20px, 2.2vw, 30px);
   /* no background and no border: the ground shows through */
   background: none;
 }
