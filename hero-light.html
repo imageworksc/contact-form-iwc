@@ -128,12 +128,18 @@
 .hero-wash {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: clamp(760px, 108vh, 1180px);
+  /* Reaches the form's first row of fields. Measured down from the top of the
+     ground on a 1440x900 screen: the hero runs to about 446px, the card starts
+     at 474, and the Name / Company labels land near 615 with their inputs
+     ending around 700. The layer is 112vh so it clears that, and the mask
+     holds full strength to 66% — about 665px — before dissolving, so the
+     colour is still there at the first row and gone by the message field. */
+  height: clamp(880px, 112vh, 1240px);
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 54%, transparent 100%);
-          mask-image: linear-gradient(180deg, #000 0, #000 54%, transparent 100%);
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 66%, transparent 100%);
+          mask-image: linear-gradient(180deg, #000 0, #000 66%, transparent 100%);
 }
 .hero-wash span {
   position: absolute;
@@ -156,11 +162,16 @@
   background: radial-gradient(closest-side circle, rgba(18,102,181,.26), rgba(18,102,181,0) 100%);
   animation: washB 97s linear infinite;
 }
-/* sky: sits low and crosses beneath both, slowest of the three */
+/* Sky: the one that reaches the form. It used to hang off the bottom of the
+   layer, which put most of its body below the clip and left only a weak tail
+   in view. Anchored from the top instead, at 38% of the layer, it sits with
+   its centre around the card's opening and its body over the Name / Company
+   row — so there is real colour down there rather than the fading edge of
+   something else. Slowest of the three, and the widest. */
 .hero-wash__s {
-  width: clamp(340px, 46vw, 720px);
-  left: 34%; bottom: -40%;
-  background: radial-gradient(closest-side circle, rgba(46,140,214,.22), rgba(46,140,214,0) 100%);
+  width: clamp(360px, 50vw, 780px);
+  left: 30%; top: 38%;
+  background: radial-gradient(closest-side circle, rgba(46,140,214,.26), rgba(46,140,214,0) 100%);
   animation: washS 127s linear infinite;
 }
 
