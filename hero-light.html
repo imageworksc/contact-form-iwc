@@ -259,7 +259,7 @@
 .hero-main {
   width: 100%;
   max-width: 880px;
-  margin-inline: auto;
+  margin-inline: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -416,7 +416,7 @@
    block above it */
 .iwc-col {
   max-width: var(--shell); margin-inline: auto; padding-inline: var(--gutter);
-  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 20px;
 }
 .iwc-col > * { width: 100%; max-width: 880px; }
 
@@ -428,7 +428,18 @@
   border-radius: 2px;
   box-shadow: 0 1px 2px rgba(20,40,80,.05), 0 10px 30px rgba(20,40,80,.06);
 }
-.iwc-form-card { padding: 44px 44px 42px; scroll-margin-top: 96px; }
+/* The form has no card of its own on this page: it sits straight on the
+   ground. .iwc-card is on the element in the shared markup, so its white
+   fill, hairline and shadow are unset here rather than the class removed —
+   that keeps this page's <main> byte-identical to option A's. */
+.iwc-card.iwc-form-card {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  scroll-margin-top: 96px;
+}
 .iwc-form-kicker {
   font-size: 12px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase;
   color: #5c9a2e; margin: 0;
