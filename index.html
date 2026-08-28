@@ -10,450 +10,84 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
 <!-- The home page's stylesheet, loaded absolutely so this file previews correctly
-     on its own. Dropping this page into the imageworks-home repo? Swap the two
-     absolute URLs below (and the assets/ paths further down) for relative ones:
-       href="styles.css"   src="assets/logo.png"   etc. -->
+     on its own. Still required after the nav and footer came out: .iw-reveal,
+     .iw-btn and .iw-link live in it and are still used by the form below.
+     With the chrome gone this is the only absolute URL left in the file —
+     dropping the page into the imageworks-home repo now means changing this
+     one line to href="styles.css". -->
 <link rel="stylesheet" href="https://imageworksc.github.io/imageworks-home/styles.css">
 
-<style>
-/* ===========================================================
-   Quote request — additions only. Nav, footer, .iw-btn,
-   .iw-link, .iw-reveal and .iw-social all come from styles.css
-   so this page can't drift away from the home page.
-   =========================================================== */
-
-/* ---------- page hero: the home hero's navy field, cut short ---------- */
-.iwc-hero {
-  position: relative;
-  display: flex; align-items: center;
-  min-height: 580px;
-  /* the copy is flex-centred, so the two pads decide where it lands — they
-     differ by the nav's 72px, exactly as the home hero's do */
-  padding: 148px 40px 76px;
-  overflow: hidden;
-  background:
-    radial-gradient(130% 100% at 50% -20%, #1e6bb0 0%, rgba(30,107,176,0) 55%),
-    radial-gradient(72% 80% at 84% 12%, rgba(32,132,206,.30) 0%, rgba(32,132,206,0) 62%),
-    radial-gradient(100% 80% at 50% 122%, rgba(5,16,33,.55) 0%, rgba(5,16,33,0) 62%),
-    linear-gradient(165deg, #103f74 0%, #0b2c55 52%, #071a38 100%);
-}
-/* ---------- the background: their own work, in duotone ----------
-   Not a pattern — the portfolio itself. Seven columns of the shots from the
-   home page's showcase ride slowly up and down at their own rates, greyscaled
-   and blended to navy so they read as a wall of work seen through the dark
-   rather than as thumbnails you're meant to study. Columns rather than rows:
-   they flank the centred copy instead of running through it.
-
-   The two sprite sheets are 2.9MB between them, so nothing is fetched until
-   the page is idle (see initShots), and never on a narrow screen or a metered
-   connection. */
-.iwc-shots {
-  position: absolute; inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  overflow: hidden;
-  /* keeps the duotone blend off the navy field underneath */
-  isolation: isolate;
-  opacity: 0;
-  transition: opacity 1.4s ease;
-  /* the wall slides under the nav and into the form band, as the home's own
-     hero canvas does */
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 13%, #000 86%, transparent 100%);
-          mask-image: linear-gradient(180deg, transparent 0, #000 13%, #000 86%, transparent 100%);
-}
-.iwc-shots.is-on { opacity: .12; }
-
-/* No pointer parallax here. The columns are already travelling, and a second
-   motion tracking the cursor on top of them read as a judder — every
-   pointermove restarted the eased transition, so the wall lagged and snatched
-   instead of gliding. The wall moves on its own clock, full stop. */
-.iwc-shots-in {
-  position: absolute; inset: -6% 0;
-  display: flex; justify-content: center; gap: 18px;
-}
-
-.iwc-col-strip {
-  flex: none;
-  display: flex; flex-direction: column; gap: 18px;
-  height: max-content;
-  will-change: transform;
-}
-/* four cadences, alternating direction, so no two neighbours travel together */
-.iwc-col-strip--0 { animation: iwcRise 68s linear infinite; }
-.iwc-col-strip--1 { animation: iwcFall 92s linear infinite; }
-.iwc-col-strip--2 { animation: iwcRise 110s linear infinite; }
-.iwc-col-strip--3 { animation: iwcFall 78s linear infinite; }
-@keyframes iwcRise { from { transform: translateY(0); }    to { transform: translateY(-50%); } }
-@keyframes iwcFall { from { transform: translateY(-50%); } to { transform: translateY(0); } }
-
-.iwc-shot {
-  flex: none;
-  width: 236px; height: 148px;
-  border-radius: 2px;
-  background-size: 100% auto;
-  background-repeat: no-repeat;
-  background-color: #081f3a;
-  /* flattened and pulled well down, so the tint below has a dark, clean
-     luminance map to sit on */
-  filter: grayscale(1) contrast(1.12) brightness(.4);
-}
-/* nothing is requested until the layer is switched on */
-.iwc-shots.is-on .iwc-shot--s1 { background-image: url("https://imageworksc.github.io/imageworks-home/assets/work-sprite-1.png"); }
-.iwc-shots.is-on .iwc-shot--s2 { background-image: url("https://imageworksc.github.io/imageworks-home/assets/work-2.png"); }
-
-/* The duotone: hue and saturation from this plate, luminosity from the shots
-   underneath. Blending only reaches the wall because the layer isolates. */
-.iwc-shots::after {
-  content: "";
-  position: absolute; inset: 0;
-  background: linear-gradient(150deg, #14538f 0%, #103f74 48%, #0a2748 100%);
-  mix-blend-mode: color;
-  pointer-events: none;
-}
-
-/* a well of depth under the copy, the way the home hero holds its own contrast */
-.iwc-hero-in::before {
-  content: "";
-  position: absolute; left: 50%; top: 50%;
-  width: 148%; height: 190%;
-  transform: translate(-50%, -50%);
-  background: radial-gradient(ellipse at center, rgba(5,18,36,.7) 0%, rgba(5,18,36,.4) 46%, rgba(5,18,36,0) 76%);
-  z-index: -1;
-  pointer-events: none;
-}
-/* The copy sits above the board and centres in the band the way the home
-   hero's does. 900px is the measure that still holds the one-line subtitle
-   whole without letting the headline run the full width of the band. */
-.iwc-hero-in {
-  position: relative; z-index: 2;
-  width: 100%; max-width: 900px; margin: 0 auto;
-  text-align: center;
-}
-
-/* the "Start a Project" kicker, arrow mark and all */
-.iwc-kicker { display: flex; align-items: center; justify-content: center; gap: 10px; }
-.iwc-kicker span {
-  font-size: 12px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase;
-  color: #80c34a;
-}
-.iwc-hero h1 {
-  margin: 20px auto 0; max-width: 940px;
-  font-size: clamp(34px, 4.4vw, 50px); line-height: 1.10; font-weight: 800;
-  letter-spacing: -1.6px; color: #fff;
-  text-wrap: balance;
-}
-.iwc-hero h1 span { color: #80c34a; }
-/* one line, always — the type scales with the viewport rather than wrapping.
-   Below 900px there isn't the width for it, so it goes back to a normal
-   wrapping paragraph. */
-.iwc-hero-sub {
-  margin: 22px auto 0;
-  white-space: nowrap;
-  font-size: clamp(15px, 1.55vw, 19px); line-height: 1.6; font-weight: 500;
-  color: rgba(226,238,252,.80);
-}
-@media (max-width: 900px) {
-  .iwc-hero-sub {
-    white-space: normal; max-width: 640px;
-    font-size: 16.5px; text-wrap: balance;
-  }
-}
-
-/* CTA row: the booking link is the solid button, the jump-to-form is the
-   hero's outlined treatment, so they don't compete */
-.iwc-hero-cta { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 36px; }
-.iwc-btn-green {
-  display: inline-flex; align-items: center; gap: 10px;
-  height: 58px; padding: 0 34px;
-  border: 0; border-radius: 2px;
-  background: #80c34a; color: #fff;
-  font-family: inherit; font-size: 17px; font-weight: 700; text-decoration: none;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(20,40,80,.14);
-}
-.iwc-btn-ghost {
-  display: inline-flex; align-items: center; gap: 10px;
-  height: 58px; padding: 0 26px;
-  border-radius: 2px;
-  background: rgba(128,195,74,.10); color: #fff;
-  border: 1.5px solid #80c34a;
-  font-size: 16px; font-weight: 700; text-decoration: none;
-  transition: background .25s ease, border-color .25s ease;
-}
-.iwc-btn-ghost:hover { background: #80c34a; border-color: #80c34a; }
-.iwc-hero-phone { margin: 22px 0 0; font-size: 15.5px; color: rgba(226,238,252,.72); }
-.iwc-hero-phone a { color: #fff; font-weight: 700; text-decoration: none; }
-
-/* ---------- body: one column, the form carrying the page ----------
-   The phone and the office addresses used to sit in a rail here; both are
-   already in the footer (and the phone in the hero too), so the rail is gone
-   and the form gets the width instead. */
-.iwc-main { position: relative; background: #f2f5f9; padding: 76px 40px 100px; }
-/* The hero centres its copy, so the card centres under it — a left-hung card
-   below a centred headline reads as a mistake. */
-.iwc-col {
-  max-width: 1240px; margin: 0 auto;
-  display: flex; flex-direction: column; align-items: center; gap: 20px;
-}
-.iwc-col > * { width: 100%; max-width: 880px; }
-
-/* card shell — same 2px corner, hairline and double shadow the home page's
-   process panel uses */
-.iwc-card {
-  background: #fff;
-  border: 1px solid #e3eaf3;
-  border-radius: 2px;
-  box-shadow: 0 1px 2px rgba(20,40,80,.05), 0 10px 30px rgba(20,40,80,.06);
-}
-.iwc-form-card { padding: 44px 44px 42px; scroll-margin-top: 96px; }
-.iwc-form-kicker {
-  font-size: 12px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase;
-  color: #5c9a2e; margin: 0;
-}
-.iwc-form-card h2 {
-  margin: 14px 0 30px;
-  font-size: 30px; line-height: 1.22; font-weight: 800; letter-spacing: -.5px; color: #143c66;
-}
-
-/* ---------- fields ---------- */
-.iwc-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-.iwc-field { margin-bottom: 20px; }
-.iwc-field > label {
-  display: block; margin-bottom: 8px;
-  font-size: 12.5px; font-weight: 800; letter-spacing: .9px; text-transform: uppercase;
-  color: #143c66;
-}
-.iwc-req { color: #5c9a2e; margin-left: 3px; }
-.iwc-opt { color: #9aa9bc; font-weight: 700; letter-spacing: .6px; text-transform: none; margin-left: 6px; }
-.iwc-hint { margin: -2px 0 10px; font-size: 15px; line-height: 1.55; color: #5a6b82; }
-/* the no-spam line is a caveat, not instruction — it sits behind a green rule
-   so it reads as an aside rather than another thing to do */
-.iwc-hint-note {
-  margin: -2px 0 12px; padding-left: 12px;
-  border-left: 2px solid #cfe6b4;
-  font-size: 13.5px; font-style: italic; line-height: 1.5; color: #7d8ea1;
-}
-
-.iwc-input, .iwc-textarea {
-  width: 100%;
-  font-family: inherit; font-size: 16px; color: #1f2b3e;
-  background: #fbfcfe;
-  border: 1px solid #dbe4ef; border-radius: 2px;
-  transition: border-color .25s ease, box-shadow .25s ease, background .25s ease;
-}
-.iwc-input { height: 52px; padding: 0 14px; }
-.iwc-textarea { padding: 14px; min-height: 150px; line-height: 1.6; resize: vertical; }
-.iwc-input::placeholder, .iwc-textarea::placeholder { color: #9fadbf; }
-.iwc-input:hover, .iwc-textarea:hover { border-color: #c6d5e7; }
-.iwc-input:focus, .iwc-textarea:focus {
-  outline: 0; background: #fff;
-  border-color: #1266b5;
-  box-shadow: 0 0 0 3px rgba(18,102,181,.14);
-}
-/* :user-invalid, not :invalid — a required field shouldn't turn red before it
-   has been touched. No JS, so nothing here can get between the form and Drupal. */
-.iwc-input:user-invalid, .iwc-textarea:user-invalid {
-  border-color: #d9544d; background: #fffafa;
-}
-.iwc-input:user-invalid:focus, .iwc-textarea:user-invalid:focus {
-  box-shadow: 0 0 0 3px rgba(217,84,77,.16);
-}
-
-/* the captcha keeps its own slot: a dashed well, so the Drupal block that
-   lands here is visibly part of the form and not floating loose */
-.iwc-captcha {
-  margin: 6px 0 26px; padding: 16px 18px;
-  border: 1.5px dashed #cfdbe9; border-radius: 2px;
-  background: #f5f9fd;
-  font-size: 14px; color: #7d8ea1;
-}
-
-.iwc-submit {
-  display: inline-flex; align-items: center; gap: 10px;
-  height: 58px; padding: 0 34px;
-  border: 0; border-radius: 2px;
-  background: #80c34a; color: #fff;
-  font-family: inherit; font-size: 17px; font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(20,40,80,.14);
-}
-.iwc-submit:focus-visible { outline: 3px solid #1266b5; outline-offset: 2px; }
-.iwc-actions { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
-.iwc-actions-note { margin: 0; font-size: 14.5px; color: #7d8ea1; }
-.iwc-actions-note a { color: #1266b5; font-weight: 700; }
-
-/* ---------- proof band: the five points, now a row under the form ---------- */
-.iwc-proof { padding: 26px 30px; }
-.iwc-trust {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 14px 22px;
-}
-.iwc-trust div {
-  display: flex; align-items: center; gap: 10px;
-  font-size: 14.5px; font-weight: 600; color: #143c66;
-  transition: transform .3s cubic-bezier(.2,.8,.3,1), color .3s ease;
-}
-.iwc-trust svg { flex: none; transition: transform .35s cubic-bezier(.2,.8,.3,1); }
-.iwc-trust div:hover { transform: translateX(3px); }
-.iwc-trust div:hover svg { transform: scale(1.14); }
-
-/* ===========================================================
-   MOTION
-   Entrance and feedback. The hero's own drift lives with the
-   background layers further up.
-   =========================================================== */
-
-/* hero entrance — same shape as the home hero: a from-state only, with
-   `backwards` so the fill drops and hover transforms still win afterwards */
-@keyframes iwcUp { from { opacity: 0; transform: translateY(16px); } }
-.iwc-kicker    { animation: iwcUp .75s cubic-bezier(.16,.84,.44,1) .05s backwards; }
-.iwc-hero h1   { animation: iwcUp .8s  cubic-bezier(.16,.84,.44,1) .16s backwards; }
-.iwc-hero-sub  { animation: iwcUp .8s  cubic-bezier(.16,.84,.44,1) .30s backwards; }
-.iwc-hero-cta  { animation: iwcUp .8s  cubic-bezier(.16,.84,.44,1) .44s backwards; }
-.iwc-hero-phone{ animation: iwcUp .8s  cubic-bezier(.16,.84,.44,1) .56s backwards; }
-
-/* the kicker's arrow nudges forward once the line has landed */
-.iwc-kicker svg { animation: iwcNudge 3.4s ease-in-out 1.4s infinite; }
-@keyframes iwcNudge { 0%, 88%, 100% { transform: translateX(0); } 94% { transform: translateX(4px); } }
-
-/* every arrow in a button tracks its hover */
-.iw-btn svg, .iwc-btn-ghost svg { transition: transform .25s cubic-bezier(.2,.8,.3,1); }
-.iw-btn:hover svg { transform: translateX(4px); }
-/* except the jump-to-form arrow, which points down */
-.iwc-btn-ghost:hover svg { transform: translateY(3px); }
-
-/* the form fields arrive in sequence once the card is in view. The card's own
-   .iw-reveal handles the card; these ride on top of it. */
-.iwc-anim { opacity: 0; transform: translateY(14px); }
-.iw-reveal.in .iwc-anim {
-  opacity: 1; transform: none;
-  transition: opacity .55s cubic-bezier(.16,.84,.44,1) var(--d, 0s),
-              transform .55s cubic-bezier(.16,.84,.44,1) var(--d, 0s);
-}
-
-/* the label picks up the focus ring's blue, so the eye has somewhere to land */
-.iwc-field:focus-within > label { color: #1266b5; }
-.iwc-field > label { transition: color .25s ease; }
-/* and the field itself lifts a hair out of the card */
-.iwc-input:focus, .iwc-textarea:focus { transform: translateY(-1px); }
-.iwc-input, .iwc-textarea { transition: border-color .25s ease, box-shadow .25s ease, background .25s ease, transform .25s ease; }
-
-/* the captcha well breathes very faintly, so an empty dashed box doesn't read
-   as something that failed to load */
-.iwc-captcha { animation: iwcWell 5.5s ease-in-out infinite; }
-@keyframes iwcWell { 0%, 100% { border-color: #cfdbe9; } 50% { border-color: #bcd0e6; } }
-
-/* ---------- responsive ---------- */
-@media (max-width: 767px) {
-  .iwc-hero { min-height: 0; padding: 122px 24px 64px; }   /* same 72px nav offset */
-  .iwc-hero h1 { letter-spacing: -1px; }
-  .iwc-main { padding: 40px 20px 64px; }
-  .iwc-form-card { padding: 30px 22px 28px; }
-  .iwc-form-card h2 { font-size: 25px; }
-  .iwc-row2 { grid-template-columns: 1fr; gap: 0; }
-  .iwc-proof { padding: 24px 22px; }
-  .iwc-trust { grid-template-columns: 1fr; gap: 13px; }
-  .iwc-hero-cta { flex-direction: column; align-items: stretch; gap: 12px; }
-  .iwc-btn-green, .iwc-btn-ghost { justify-content: center; }
-  .iwc-submit { width: 100%; justify-content: center; }
-}
-/* On a narrow screen the copy takes the whole band, so the wall would sit
-   behind it rather than around it. It is never even fetched there. */
-@media (max-width: 900px) {
-  .iwc-shots { display: none; }
-}
-
-/* ---------- reduced motion ---------- */
-/* styles.css already neutralises .iw-reveal; these are this page's own. The
-   wall of work stays up and stays lit — the columns simply stop travelling.
-   Each one holds at the top of its doubled list, which still overfills the
-   band, so stopping them leaves no gaps. */
-@media (prefers-reduced-motion: reduce) {
-  .iwc-col-strip,
-  .iwc-kicker, .iwc-hero h1, .iwc-hero-sub, .iwc-hero-cta, .iwc-hero-phone,
-  .iwc-kicker svg, .iwc-captcha { animation: none !important; }
-  .iwc-anim { opacity: 1; transform: none; }
-  .iw-reveal.in .iwc-anim { transition: none; }
-  .iw-btn:hover svg, .iwc-btn-ghost:hover svg { transform: none; }
-  .iwc-input:focus, .iwc-textarea:focus { transform: none; }
-  .iwc-trust div:hover { transform: none; }
-  .iwc-trust div:hover svg { transform: none; }
-}
-</style>
+<!-- This page's own styles. Named contact.css rather than styles.css so it
+     can't collide with the home page's sheet linked above if this file is
+     dropped into the imageworks-home repo. -->
+<link rel="stylesheet" href="contact.css">
 
 <!-- no JS means no .in class, and the staged items would never arrive.
-     A quote form that can't be read is worse than one that doesn't animate. -->
-<noscript><style>
-  .iw-reveal { opacity: 1 !important; transform: none !important; }
-  .iwc-anim  { opacity: 1 !important; transform: none !important; }
-</style></noscript>
+     A quote form that can't be read is worse than one that doesn't animate.
+     Only fetched when scripting is off, so it costs a request nowhere else. -->
+<noscript><link rel="stylesheet" href="contact-noscript.css"></noscript>
+
+<!-- The hero's staged entrance is gated on this attribute, set before first
+     paint so the copy never flashes in and then re-animates. Without JS the
+     attribute never lands and the hero simply renders in place. -->
+<script>document.documentElement.setAttribute('data-hero-anim', 'on');</script>
 </head>
 
 <body>
-<div style="position:relative;width:100%;overflow-x:clip;background:#fff;">
+<div class="iwc-page">
 
-<!-- ===================== NAV (identical to the home page) ===================== -->
-<nav data-nav style="position:absolute;top:0;left:0;width:100%;height:72px;z-index:120;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:box-shadow .35s ease,background .35s ease;">
-  <a href="https://imageworksc.github.io/imageworks-home/#top" style="display:flex;align-items:center;text-decoration:none;">
-    <img src="https://imageworksc.github.io/imageworks-home/assets/logo.png" alt="ImageWorks Creative" style="height:34px;width:auto;display:block;"/>
-  </a>
-  <div class="iw-nav-links" id="iw-nav-links" style="display:flex;align-items:center;gap:30px;">
-    <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:15px;font-weight:600;color:#3d464d;">Marketing</a>
-    <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:15px;font-weight:600;color:#3d464d;">Web Plans</a>
-    <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:15px;font-weight:600;color:#3d464d;">Branding</a>
-    <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:15px;font-weight:600;color:#3d464d;">Our Work</a>
-    <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#why" style="font-size:15px;font-weight:600;color:#3d464d;">About</a>
-    <!-- current page: green, the way the mobile nav already marks Contact -->
-    <a class="iw-link iw-nav-contact" href="#top" aria-current="page" style="font-size:15px;font-weight:700;color:#5c9a2e;">Contact</a>
-  </div>
-  <button class="iw-nav-toggle" type="button" aria-label="Menu" aria-controls="iw-nav-links" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
+<!-- No nav and no footer: this page is a fragment, and whatever it is embedded
+     in supplies its own. The hero's top padding no longer carries the 72px of
+     nav clearance it used to — see .hero in contact.css. -->
 
-<!-- ===================== HERO ===================== -->
-<header id="top" data-hero class="iwc-hero">
+<!-- The hero and the form stand on one ground: a single pale gradient running
+     the height of both, with the three colour washes floating over it and
+     dissolving somewhere inside the form band. No rule between them, no change
+     of surface — the seam is only where the gradient happens to be. -->
+<div class="ground">
 
-  <!-- Background: their own work, greyscaled and tinted navy, in columns that
-       ride past at four different rates. The shots and their sprite offsets are
-       the eight from the home page's showcase. The image files are only
-       requested once the page is idle — see initShots. -->
-  <div class="iwc-shots" data-shots aria-hidden="true">
-    <div class="iwc-shots-in">
-      <div class="iwc-col-strip iwc-col-strip--0"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span></div>
-      <div class="iwc-col-strip iwc-col-strip--1"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span></div>
-      <div class="iwc-col-strip iwc-col-strip--2"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span></div>
-      <div class="iwc-col-strip iwc-col-strip--3"><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span></div>
-      <div class="iwc-col-strip iwc-col-strip--0"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span></div>
-      <div class="iwc-col-strip iwc-col-strip--1"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 6%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 42%"></span><span class="iwc-shot iwc-shot--s2" style="background-position:50% 94%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 96%"></span></div>
-      <div class="iwc-col-strip iwc-col-strip--2"><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 58%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 74%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 0%"></span><span class="iwc-shot iwc-shot--s1" style="background-position:50% 27%"></span></div>
-    </div>
+  <!-- one element per wash: they travel by transform, in different directions
+       and at different rates, so they drift apart and back together instead of
+       sliding as one sheet -->
+  <div class="hero-wash" aria-hidden="true">
+    <span class="hero-wash__g"></span>
+    <span class="hero-wash__b"></span>
+    <span class="hero-wash__s"></span>
   </div>
 
-  <div class="iwc-hero-in">
+<!-- ===================== HERO — option B, light =====================
+     Construction taken from the Custom Web Design page: white ground, a
+     the claim and call on the left. There is no rule under it and no band
+     change: the hero and the form share one ground, and the washes carry
+     across the seam. See .ground in the stylesheet. -->
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="wrap hero-inner">
+    <div class="hero-main">
 
-    <div class="iwc-kicker">
-      <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
-        <path d="M1 7 H17" stroke="#80C34A" stroke-width="2.5" stroke-linecap="round"/>
-        <path d="M11 1 L17.5 7 L11 13" stroke="#80C34A" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span>Start a Project</span>
+      <div class="hero-kicker">
+        <svg width="20" height="14" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+          <path d="M1 7 H17" stroke="#5c9a2e" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M11 1 L17.5 7 L11 13" stroke="#5c9a2e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Start a Project</span>
+      </div>
+
+      <h1 id="hero-title">Let&rsquo;s Build Something <span class="accent">Amazing</span></h1>
+      <p class="hero-sub">Tell us about your project, what you need help with, and what you want to accomplish.</p>
+
+      <div class="btn-row">
+        <a class="btn btn--solid" href="https://meetings.hubspot.com/scott-margenau?uuid=e353836e-b414-40c5-bb6f-87aea188af23" target="_blank" rel="noopener">Book a Meeting with Scott
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+        <a class="btn btn--quiet" href="#project-form">or tell us about your project
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+        </a>
+      </div>
+
+      <p class="hero-phone">Or call or text us: <a href="tel:7039287309">(703) 928-7309</a></p>
     </div>
-
-    <h1>Let&rsquo;s Build Something <span>Amazing</span></h1>
-    <p class="iwc-hero-sub">Tell us about your project, what you need help with, and what you want to accomplish.</p>
-
-    <div class="iwc-hero-cta">
-      <a class="iw-btn iwc-btn-green" href="https://meetings.hubspot.com/scott-margenau?uuid=e353836e-b414-40c5-bb6f-87aea188af23" target="_blank" rel="noopener">Book a Meeting with Scott
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-      </a>
-      <a class="iwc-btn-ghost" href="#project-form">or tell us about your project
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-      </a>
-    </div>
-
-    <p class="iwc-hero-phone">Or call or text us: <a href="tel:7039287309">(703) 928-7309</a></p>
   </div>
-</header>
+</section>
 
 <!-- ===================== FORM ===================== -->
 <main class="iwc-main">
@@ -461,14 +95,14 @@
 
     <!-- ---------- the form ---------- -->
     <section class="iwc-card iwc-form-card iw-reveal" id="project-form" aria-labelledby="iwc-form-h">
-      <p class="iwc-form-kicker iwc-anim" style="--d:.05s">Prefer to write it out instead?</p>
-      <h2 id="iwc-form-h" class="iwc-anim" style="--d:.12s">Tell us about your project</h2>
+      <p class="iwc-form-kicker iwc-anim">Prefer to write it out instead?</p>
+      <h2 id="iwc-form-h" class="iwc-anim">Tell us about your project</h2>
 
       <!-- Same Drupal endpoint as before: a site-root path, so submitting only
            works once this page is served from the Drupal domain. -->
       <form action="/lets-grow-your-brand" method="post">
 
-        <div class="iwc-row2 iwc-anim" style="--d:.20s">
+        <div class="iwc-row2 iwc-anim">
           <div class="iwc-field">
             <label for="name">Name<span class="iwc-req">*</span></label>
             <input class="iwc-input" type="text" id="name" name="name" autocomplete="name" required>
@@ -479,7 +113,7 @@
           </div>
         </div>
 
-        <div class="iwc-row2 iwc-anim" style="--d:.28s">
+        <div class="iwc-row2 iwc-anim">
           <div class="iwc-field">
             <label for="email">Email<span class="iwc-req">*</span></label>
             <input class="iwc-input" type="email" id="email" name="email" autocomplete="email" required>
@@ -490,21 +124,21 @@
           </div>
         </div>
 
-        <div class="iwc-field iwc-anim" style="--d:.36s">
+        <div class="iwc-field iwc-anim">
           <label for="websiteurl">Website<span class="iwc-opt">optional</span></label>
           <input class="iwc-input" type="text" id="websiteurl" name="websiteurl" autocomplete="url">
         </div>
 
-        <div class="iwc-field iwc-anim" style="--d:.44s">
+        <div class="iwc-field iwc-anim">
           <label for="project_details">How can we help you?<span class="iwc-req">*</span></label>
           <p class="iwc-hint">Tell us what you want to build, improve, or fix, along with any goals or important details.</p>
           <p class="iwc-hint-note">Please, no spam. This form is for real customers only &mdash; no sales pitches, partnership offers, or solicitations.</p>
           <textarea class="iwc-textarea" id="project_details" name="project_details" required></textarea>
         </div>
 
-        <div class="iwc-captcha iwc-anim" style="--d:.52s">[ reCAPTCHA renders here &mdash; existing Drupal captcha block ]</div>
+        <div class="iwc-captcha iwc-anim">[ reCAPTCHA renders here &mdash; existing Drupal captcha block ]</div>
 
-        <div class="iwc-actions iwc-anim" style="--d:.60s">
+        <div class="iwc-actions iwc-anim">
           <button class="iw-btn iwc-submit" type="submit">Start the Conversation
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
@@ -516,167 +150,21 @@
     <!-- ---------- the five proof points, under the form where the original had them ---------- -->
     <section class="iwc-card iwc-proof iw-reveal" aria-label="Why ImageWorks">
       <div class="iwc-trust">
-        <div class="iwc-anim" style="--d:.06s"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Award-Winning Since 1997</div>
-        <div class="iwc-anim" style="--d:.14s"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Senior-Level Creative Direction</div>
-        <div class="iwc-anim" style="--d:.22s"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drupal &amp; WordPress CMS</div>
-        <div class="iwc-anim" style="--d:.30s"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>No Templates</div>
-        <div class="iwc-anim" style="--d:.38s"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>No Shortcuts</div>
+        <div class="iwc-anim"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Award-Winning Since 1997</div>
+        <div class="iwc-anim"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Senior-Level Creative Direction</div>
+        <div class="iwc-anim"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Drupal &amp; WordPress CMS</div>
+        <div class="iwc-anim"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>No Templates</div>
+        <div class="iwc-anim"><svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true"><circle cx="7.5" cy="7.5" r="7" fill="#eef6e8"/><path d="M4.4 7.8 L6.6 10 L10.8 5.2" stroke="#4a8628" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>No Shortcuts</div>
       </div>
     </section>
 
   </div>
 </main>
-
-<!-- ===================== FOOTER (identical to the home page) ===================== -->
-<footer class="iw-footer" style="background:#0a2c4d;color:#fff;padding:104px 40px 0;">
-  <div class="iw-foot-grid" style="max-width:1340px;margin:0 auto;display:grid;grid-template-columns:1fr 1.5fr 1.15fr;gap:80px;align-items:start;">
-    <div style="font-size:16px;line-height:1.5;color:#fff;">
-      <img src="https://imageworksc.github.io/imageworks-home/assets/footer-logo.png" alt="ImageWorks Creative" style="width:168px;height:auto;display:block;"/>
-      <div style="display:flex;align-items:center;gap:8px;font-weight:600;margin-top:26px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#80c34a" stroke-width="2.4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Ashburn, VA Location</div>
-      <div style="margin:4px 0 0 24px;color:rgba(255,255,255,.85);">44679 Endicott Dr Suite 300<br>Unit 580 | Ashburn, VA 20147</div>
-      <div style="display:flex;align-items:center;gap:8px;font-weight:600;margin-top:20px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#80c34a" stroke-width="2.4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>St. Petersburg, FL Location</div>
-      <div style="margin:4px 0 0 24px;color:rgba(255,255,255,.85);">433 Central Ave<br>4th floor | St. Petersburg, FL 33701</div>
-      <div style="display:flex;align-items:center;gap:8px;font-weight:600;margin-top:20px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#80c34a" stroke-width="2.4"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>Questions? Quote?</div>
-      <div style="margin:4px 0 0 24px;color:rgba(255,255,255,.85);">Call or text us: <a href="tel:7039287309" style="color:#fff;font-weight:700;text-decoration:none;">(703) 928-7309</a></div>
-      <div style="display:flex;gap:10px;margin-top:26px;">
-        <a class="iw-social" href="#top" aria-label="Facebook" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:2px;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.52 1.49-3.91 3.78-3.91 1.1 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94Z"/></svg></a>
-        <a class="iw-social" href="#top" aria-label="X" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:2px;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.22-6.82-5.97 6.82H1.66l7.73-8.84L1.24 2.25H8.08l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.01 4.13H5.04l12.04 15.64Z"/></svg></a>
-        <a class="iw-social" href="#top" aria-label="LinkedIn" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:2px;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14ZM7.12 20.45H3.55V9h3.57v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.22.79 24 1.77 24h20.45c.98 0 1.78-.78 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg></a>
-        <a class="iw-social" href="#top" aria-label="Instagram" style="display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:2px;background:rgba(255,255,255,.12);color:#fff;text-decoration:none;"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16ZM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.3-1.46.72-2.12 1.38C1.35 2.68.93 3.35.63 4.14.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.38 2.12.66.66 1.33 1.08 2.12 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56.79-.3 1.46-.72 2.12-1.38.66-.66 1.08-1.33 1.38-2.12.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91-.3-.79-.72-1.46-1.38-2.12A5.92 5.92 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.41-10.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z"/></svg></a>
-      </div>
-    </div>
-    <div class="iw-foot-menus" style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start;">
-      <div>
-        <div style="font-size:16px;font-weight:700;color:#80c34a;letter-spacing:.5px;">Services</div>
-        <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Web Design</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Digital Marketing</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Branding</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Website &amp; Marketing Plans</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Website Maintenance</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Content Writing</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Google Maps Optimization</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">SEO + AIO Optimization</a>
-        </div>
-      </div>
-      <div>
-        <div style="font-size:16px;font-weight:700;color:#80c34a;letter-spacing:.5px;">Company</div>
-        <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#work" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Our Work</a>
-          <a class="iw-link" href="https://imageworksc.github.io/imageworks-home/#why" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">About</a>
-          <a class="iw-link" href="#" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Awards</a>
-          <a class="iw-link" href="#" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Testimonials</a>
-          <a class="iw-link" href="#top" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Contact</a>
-        </div>
-        <div style="margin-top:28px;font-size:16px;font-weight:700;color:#80c34a;letter-spacing:.5px;">Platform Expertise</div>
-        <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
-          <a class="iw-link" href="#" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">Drupal</a>
-          <a class="iw-link" href="#" style="font-size:16px;color:#fff;text-decoration:none;width:fit-content;">WordPress</a>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div style="border-radius:2px;overflow:hidden;box-shadow:0 1px 3px rgba(20,40,80,.12),0 10px 26px rgba(20,40,80,.12);"><img src="https://imageworksc.github.io/imageworks-home/assets/footer-map.png" alt="Map of ImageWorks Creative locations" style="width:100%;display:block;"/></div>
-      <div style="margin-top:40px;font-size:16px;font-weight:700;">Subscribe to Our Newsletter</div>
-      <div style="margin-top:6px;color:rgba(255,255,255,.85);font-size:15px;">Marketing insights &amp; company news sent straight to your inbox</div>
-      <form onsubmit="return false" style="margin-top:12px;display:flex;gap:8px;max-width:320px;">
-        <input type="email" placeholder="Email Address" aria-label="Email Address" style="flex:1;height:40px;border:none;border-radius:2px;padding:0 12px;font-family:inherit;font-size:14px;color:#333;"/>
-        <button class="iw-btn" aria-label="Subscribe" style="border:none;cursor:pointer;width:48px;height:40px;border-radius:2px;background:#80c34a;color:#fff;font-size:18px;">→</button>
-      </form>
-    </div>
-  </div>
-  <div style="max-width:1340px;margin:48px auto 0;padding:22px 0;border-top:1px solid rgba(255,255,255,.18);text-align:center;font-size:14px;color:rgba(255,255,255,.85);">
-    © 2026 ImageWorks Creative, a full-service marketing company, branding firm, and web design agency since 1997. All rights reserved.
-    <div style="margin-top:8px;"><a class="iw-link" href="#" style="color:#fff;text-decoration:none;">Sitemap</a> &nbsp;|&nbsp; <a class="iw-link" href="#" style="color:#fff;text-decoration:none;">Privacy Policy</a></div>
-  </div>
-  <div style="height:50px;"></div>
-</footer>
+</div>
 
 </div>
 
-<script>
-/* -----------------------------------------------------------
-   Only what this page needs: the home page's nav behaviour and
-   its scroll reveal, copied from script.js. The rest of that
-   file (hero mesh, marquees, step rail) has nothing to bind to
-   here. Nothing touches the form — Drupal owns the submit.
-   ----------------------------------------------------------- */
-(function () {
-  'use strict';
-  var REDUCE = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  function initNav() {
-    var nav = document.querySelector('[data-nav]');
-    if (!nav) return;
-    function onScroll() {
-      var y = window.scrollY || 0;
-      nav.style.boxShadow = y > 12 ? '0 6px 24px rgba(15,36,64,.10)' : '0 0 0 rgba(0,0,0,0)';
-      nav.style.background = y > 12 ? 'rgba(255,255,255,.94)' : 'rgba(255,255,255,.86)';
-    }
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
-
-    var toggle = nav.querySelector('.iw-nav-toggle');
-    var links  = nav.querySelector('.iw-nav-links');
-    if (!toggle || !links) return;
-    function setOpen(open) {
-      nav.classList.toggle('iw-nav-open', open);
-      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-    }
-    toggle.addEventListener('click', function (e) {
-      e.stopPropagation();
-      setOpen(!nav.classList.contains('iw-nav-open'));
-    });
-    links.addEventListener('click', function (e) { if (e.target.closest('a')) setOpen(false); });
-    document.addEventListener('click', function (e) {
-      if (nav.classList.contains('iw-nav-open') && !nav.contains(e.target)) setOpen(false);
-    });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
-    window.addEventListener('resize', function () { if (window.innerWidth > 1024) setOpen(false); }, { passive: true });
-  }
-
-  function initReveal() {
-    var els = document.querySelectorAll('.iw-reveal');
-    if (REDUCE || !('IntersectionObserver' in window)) {
-      els.forEach(function (el) { el.classList.add('in'); });
-      return;
-    }
-    var obs = new IntersectionObserver(function (entries, o) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add('in'); o.unobserve(en.target); }
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
-    els.forEach(function (el) { obs.observe(el); });
-  }
-
-  /* -----------------------------------------------------------
-     The wall of work is decoration sitting on 2.9MB of sprite
-     sheets. Switching the layer on is what puts the URLs into
-     the stylesheet's matched rules, so nothing is requested
-     until we say so: never on a narrow screen, never on a
-     metered connection, and otherwise only once the page has
-     finished loading and gone idle.
-     ----------------------------------------------------------- */
-  function initShots() {
-    var shots = document.querySelector('[data-shots]');
-    if (!shots) return;
-    if (window.innerWidth <= 900) return;
-
-    var conn = navigator.connection;
-    if (conn && (conn.saveData || /(^|-)2g$/.test(conn.effectiveType || ''))) return;
-
-    function on() {
-      if (window.requestIdleCallback) window.requestIdleCallback(function () { shots.classList.add('is-on'); }, { timeout: 2500 });
-      else window.setTimeout(function () { shots.classList.add('is-on'); }, 400);
-    }
-    if (document.readyState === 'complete') on();
-    else window.addEventListener('load', on, { once: true });
-  }
-
-  function boot() { initNav(); initReveal(); initShots(); }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
-})();
-</script>
+<!-- scroll reveal only; nothing here touches the form -->
+<script src="contact.js"></script>
 </body>
 </html>

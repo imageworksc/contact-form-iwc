@@ -1,0 +1,10 @@
+/* ===========================================================
+   Loaded only from inside <noscript> in index.html.
+
+   The staged items start at opacity 0 and wait for contact.js to put .in on
+   their .iw-reveal parent. With JS off that class never lands, so without
+   this sheet the form would be invisible — a quote form that can't be read is
+   worse than one that doesn't animate.
+   =========================================================== */
+.iw-reveal { opacity: 1 !important; transform: none !important; }
+.iwc-anim  { opacity: 1 !important; transform: none !important; }

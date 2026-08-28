@@ -1,0 +1,588 @@
+/* ===========================================================
+   Quote request — OPTION B, light hero.
+   The hero is lifted from the Custom Web Design page: white
+   ground, the home's woven cloth drawn dark on white, hairline
+   rules top and bottom, claim and call on the left, credentials
+   on a pane of glass to the right. Everything below the hero is
+   option A unchanged.
+
+   The nav and footer this page used to carry have been removed —
+   it is a fragment now, and its host supplies its own chrome. The
+   home's styles.css is still linked though, and still needed:
+   .iw-reveal, .iw-btn and .iw-link all live there and are all
+   still used by the form below.
+   =========================================================== */
+
+/* ---- the tokens the hero needs, verbatim from that page ---- */
+:root {
+  --navy: #143c66;
+  --green: #80c34a;
+  --green-ink: #5c9a2e;
+  --muted: #5a6b82;
+  --faint: #7d8ea1;
+  --white: #ffffff;
+  --border: #e3eaf3;
+  --chip-green: #eaf6dd;
+  --r: 2px;
+  --shadow-lift: 0 4px 12px rgba(20, 40, 80, .18);
+  --shell: 1180px;
+  --gutter: clamp(22px, 4vw, 40px);
+  --ease: cubic-bezier(.16, .84, .44, 1);
+}
+
+/* --------------------------------------------------------------------------
+   THE WRAPPER
+   The nav and footer this page used to carry were removed: it is a fragment
+   now, and whatever it is embedded in supplies its own chrome. This element
+   is what survives of that block. It still earns its place — overflow-x here
+   is what keeps the 880px columns below from forcing a horizontal scrollbar,
+   and position:relative keeps the hero's wash layer measuring against the
+   page rather than the viewport.
+   -------------------------------------------------------------------------- */
+.iwc-page { position: relative; width: 100%; overflow-x: clip; background: #fff; }
+
+.wrap {
+  width: 880px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* --------------------------------------------------------------------------
+   HERO — same construction as the home's, inverted to a light ground
+   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   THE GROUND — hero and form on one surface
+   There is no rule under the hero and no second band beneath it. Both sections
+   stand on this one element, which carries a single pale gradient down through
+   the pair: white where the headline sits, settling into the #f2f5f9 the form
+   band used to declare for itself. Because it is one gradient over the whole
+   height, there is no edge anywhere to read as a seam.
+   -------------------------------------------------------------------------- */
+.ground {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: linear-gradient(180deg,
+    #ffffff 0%,
+    #fdfeff 22%,
+    #f8fbfe 44%,
+    #f4f7fb 64%,
+    #f2f5f9 82%);
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* enough height to hold the fold without pushing the form off it */
+  /* No floor. It used to be min(72vh, 600px), which was taller than the copy
+     needs now that both lines run whole — and with the content flex-centred,
+     any slack it forced came straight back as air above and below. The two
+     pads below decide the height on their own.
+
+     The foot stays shorter than the head: with no rule and no band change
+     under it, a long tail of empty ground just pushes the form away. */
+  min-height: 0;
+  /* The head was calc(var(--nav-h) + clamp(48px, 4.4vw, 64px)). 72px of that
+     was clearance for a nav positioned over this band — the nav is gone, so
+     the clearance went with it, otherwise the page opens on dead space.
+     Restore the calc() (and --nav-h) if a fixed header is ever put back.
+
+     The vw term is tuned to the bounds: at 3vw the preferred value fell below
+     the 48px floor and every viewport clamped to it, so the head stopped
+     growing with the page. */
+  padding-block: clamp(48px, 4.4vw, 64px) clamp(20px, 2.2vw, 30px);
+  /* no background and no border: the ground shows through */
+  background: none;
+}
+
+/* ---------- the ground: washes of brand colour, each on its own heading ----------
+   One element per wash, moved by transform.
+
+   This started as three background layers on a single pseudo-element, animated
+   with `background-position`. It barely moved, and the reason is worth keeping
+   here: a percentage background-position is not a distance, it is a fraction of
+   the *free space* between the image and its box. With each wash sized at ~70%
+   of the band, the free space is ~30%, so travelling "from 6% to 44%" moved it
+   about a tenth of the width — over two minutes, invisible.
+
+   Transforms have no such compression: a percentage there is a fraction of the
+   element itself, and it composites rather than repainting. Separate elements
+   also mean separate clocks and separate directions, which is the point — the
+   green runs one way, the blue the other, and they drift apart and back
+   together instead of sliding as one sheet.
+
+   Pale on purpose: on a white ground anything stronger stops reading as light
+   and starts reading as decoration. */
+/* The washes belong to the ground, not to the hero, so they carry past the
+   hero's last line and dissolve well inside the form band. That crossing is
+   what makes the two sections read as one surface: the colour doesn't stop
+   where the copy does. Fixed height rather than inset:0, because the ground is
+   as tall as the form and washes spread over all of it would go flat. */
+/* Vertically this layer is measured in pixels, not viewport units, and that is
+   the whole point of it.
+
+   It used to be 112vh tall with the washes sized in vw. But what it has to
+   line up with — the hero's copy, the card, the first row of fields — is a
+   stack of type and padding whose height barely changes with the screen. On a
+   taller or wider monitor the layer and the washes grew while the fields
+   stayed put, so the colour slid off them. Anything vertical here is therefore
+   in px and holds its position at every resolution.
+
+   The numbers, down from the top of the ground: the hero ends at ~451px, the
+   card opens at ~479, the Name / Company labels sit at ~620 and their inputs
+   end at ~696. The mask holds full strength to 700px so the whole first row is
+   covered, then dissolves by 1040.
+
+   Widths stay proportional — a wash should still span a wide band — which is
+   why the gradients below are ellipses rather than circles: the box is wide
+   and short, and `circle` would take its radius from the short side. */
+.hero-wash {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1040px;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(180deg, #000 0, #000 700px, transparent 1040px);
+          mask-image: linear-gradient(180deg, #000 0, #000 700px, transparent 1040px);
+}
+/* Fixed size, and placed from the centre line rather than from an edge.
+
+   Widths were still in vw and the offsets in %, so a wider screen stretched
+   each wash and pushed them apart — the same drift as before, along the other
+   axis. Every number here is px now, and `left: 50%` plus a px margin hangs
+   each one off the middle of the page. That is the right anchor because the
+   content is centred too: the shell, the copy block and the card all sit on
+   that line, so the washes keep their relationship to them at any width.
+
+   The offsets read as "how far the wash's left edge sits from the centre". */
+.hero-wash span {
+  position: absolute;
+  left: 50%;
+  will-change: transform;
+}
+
+/* green: opens top-left of the copy, runs down and to the right */
+.hero-wash__g {
+  width: 1015px; height: 830px;
+  margin-left: -987px; top: -315px;
+  background: radial-gradient(closest-side ellipse at center, rgba(128,195,74,.24), rgba(128,195,74,0) 100%);
+  animation: washG 71s linear infinite;
+}
+/* brand blue: opens top-right, runs the other way — left and down */
+.hero-wash__b {
+  width: 1090px; height: 910px;
+  margin-left: -75px; top: -295px;
+  background: radial-gradient(closest-side ellipse at center, rgba(18,102,181,.21), rgba(18,102,181,0) 100%);
+  animation: washB 97s linear infinite;
+}
+/* Sky: the one that has to hold the first row of fields. Its centre is parked
+   at 630px down — the Name / Company labels — and just right of the page's
+   centre line, over the Company column. Its own travel only carries that
+   centre between about 510 and 760 vertically, so the row is inside it at
+   every point of the loop. Slowest of the three, and the widest. */
+.hero-wash__s {
+  width: 1170px; height: 860px;
+  margin-left: -545px; top: 200px;
+  background: radial-gradient(closest-side ellipse at center, rgba(46,140,214,.21), rgba(46,140,214,0) 100%);
+  animation: washS 127s linear infinite;
+}
+
+/* Vertical travel only, matching the setup-optimization page. When these
+   also moved on X the three drifted across one another and the colour
+   piled up wherever two happened to meet; holding the lanes and letting
+   each only rise and fall keeps them apart. Closed loops at a constant
+   rate, so nothing decelerates and reverses. The three periods share no
+   useful factor, so the arrangement takes hours to recur. */
+@keyframes washG {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, 22%, 0); }
+  50%  { transform: translate3d(0, 6%, 0); }
+  75%  { transform: translate3d(0, -14%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes washB {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, 26%, 0); }
+  50%  { transform: translate3d(0, -8%, 0); }
+  75%  { transform: translate3d(0, -24%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes washS {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(0, -16%, 0); }
+  50%  { transform: translate3d(0, 10%, 0); }
+  75%  { transform: translate3d(0, 20%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+/* A sheen crossing the surface, the way light moves over one. Faint and slow —
+   at any more than this it stops being the room's light and starts being an
+   effect. Its clock doesn't divide into the washes', so the pair never visibly
+   repeats.
+
+   It rides inside the wash layer rather than on the hero: on the hero its
+   bottom edge would cut a faint diagonal across the seam, whereas here it
+   fades out under the same mask as everything else. */
+.hero-wash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(102deg,
+    rgba(255,255,255,0) 30%, rgba(255,255,255,.34) 50%, rgba(255,255,255,0) 70%);
+  background-repeat: no-repeat;
+  background-size: 260% 100%;
+  animation: heroSheen 47s ease-in-out infinite;
+}
+@keyframes heroSheen {
+  0%, 100% { background-position: 124% 0; }
+  50%      { background-position: -24% 0; }
+}
+
+/* One column, centred in the band, with the copy inside it still ragged right.
+   Centred text at this size gives every line its own axis and the eye has to
+   hunt for each start; a centred *block* of left-aligned copy reads as centred
+   while every line keeps the same left edge.
+
+   That edge is set by the form card below: same 880px measure, same centring,
+   so the headline starts exactly where the card's first field label does. It
+   is a wider box than the copy needs, which is the trade — the words sit a
+   little left of the band's optical centre in exchange for the two blocks
+   lining up. */
+.hero-inner { position: relative; text-align: left; }
+.hero-main {
+  width: 100%;
+  max-width: 880px;
+  margin-inline: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.hero-kicker { display: flex; align-items: center; gap: 10px; }
+.hero-kicker span {
+  font-size: 14px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase;
+  color: var(--green-ink);
+}
+
+/* Both lines run whole, so neither carries a measure any more — the type is
+   sized to fit the 880px block instead. The ceilings are what 29 and 85
+   characters of Plus Jakarta Sans ExtraBold / Medium actually occupy at that
+   width, with the headline's -.035em tracking counted in; below those the vw
+   term takes over and they shrink with the viewport rather than wrapping. */
+.hero h1 {
+  margin: 0;
+  font-size: clamp(34px, 4.4vw, 48px);
+  line-height: 1.06;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  color: var(--navy);
+  white-space: nowrap;
+}
+.hero h1 .accent { color: var(--green-ink); }
+
+.hero-sub {
+  margin: 0;
+  font-size: clamp(17px, 2vw, 20px);
+  line-height: 1.65;
+  font-weight: 500;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.btn-row { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 10px; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  height: 54px;
+  padding-inline: 26px;
+  border-radius: var(--r);
+  border: 1.5px solid transparent;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform .25s var(--ease), background-color .25s ease,
+              border-color .25s ease, box-shadow .25s ease, color .25s ease;
+}
+.btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+.btn:active { transform: translateY(-1px); }
+.btn--solid { background: var(--green); border-color: var(--green); color: #fff; }
+.btn--solid:hover { filter: brightness(1.04); }
+.btn--quiet { border-color: var(--border); color: var(--navy); font-weight: 600; font-size: 15px; }
+.btn--quiet:hover { border-color: #c3d6ea; }
+/* The quiet button is transparent elsewhere, which here would let the weave
+   run straight through it. Only the hero fills it. */
+.hero .btn--quiet { background: var(--white); }
+
+.hero-phone { margin: 0; font-size: 15px; color: var(--faint); }
+.hero-phone a { color: var(--navy); font-weight: 700; text-decoration: none; }
+.hero-phone a:hover { text-decoration: underline; }
+
+/* Below this there isn't the width to hold 85 characters on one line without
+   the type going too small to read, so both go back to wrapping paragraphs
+   with a measure. */
+@media (max-width: 900px) {
+  /* Both lines wrap here and the buttons stack, so the copy is roughly 120px
+     taller and the first row of fields sits nearer 715px. The layer and its
+     mask move down to match — still px, still the same at every width. */
+  .hero-wash {
+    height: 1200px;
+    -webkit-mask-image: linear-gradient(180deg, #000 0, #000 800px, transparent 1200px);
+            mask-image: linear-gradient(180deg, #000 0, #000 800px, transparent 1200px);
+  }
+  .hero-wash__s { top: 380px; }
+
+  .hero h1 {
+    white-space: normal;
+    max-width: 20ch;
+    font-size: clamp(34px, 5.6vw, 42px);
+    text-wrap: balance;
+  }
+  .hero-sub {
+    white-space: normal;
+    max-width: 52ch;
+    font-size: 17px;
+    text-wrap: pretty;
+  }
+}
+
+/* ---------- the five proof points, in a band under the form ---------- */
+.iwc-proof { padding: 26px 30px; }
+.iwc-trust {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); gap: 14px 22px;
+}
+.iwc-trust div {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14.5px; font-weight: 600; color: var(--navy);
+  transition: transform .3s var(--ease), color .3s ease;
+}
+.iwc-trust svg { flex: none; transition: transform .35s var(--ease); }
+.iwc-trust div:hover { transform: translateX(3px); }
+.iwc-trust div:hover svg { transform: scale(1.14); }
+
+/* Staged entrance, built the way the home stages its own hero: each block
+   lifts in on its own delay, and the green phrase lands last. `backwards`
+   drops the fill afterwards so hover states still win. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-hero-anim="on"] .hero-kicker,
+  [data-hero-anim="on"] .hero h1,
+  [data-hero-anim="on"] .hero-sub,
+  [data-hero-anim="on"] .hero .btn-row,
+  [data-hero-anim="on"] .hero-phone { animation: hero-in .8s var(--ease) backwards; }
+  [data-hero-anim="on"] .hero-kicker { animation-delay: .02s; }
+  [data-hero-anim="on"] .hero h1 { animation-delay: .10s; }
+  [data-hero-anim="on"] .hero-sub { animation-delay: .28s; }
+  [data-hero-anim="on"] .hero .btn-row { animation-delay: .44s; }
+  [data-hero-anim="on"] .hero-phone { animation-delay: .54s; }
+
+  /* inline-block only where the phrase can't be pushed off the measure */
+  @media (min-width: 640px) {
+    [data-hero-anim="on"] .hero h1 .accent {
+      display: inline-block;
+      animation: hero-in .8s var(--ease) .34s backwards;
+    }
+  }
+}
+@keyframes hero-in { from { opacity: 0; transform: translateY(14px); } }
+
+/* the kicker's arrow nudges forward once the line has landed */
+.hero-kicker svg { animation: iwcNudge 3.4s ease-in-out 1.6s infinite; }
+@keyframes iwcNudge { 0%, 88%, 100% { transform: translateX(0); } 94% { transform: translateX(4px); } }
+/* the solid button's arrow tracks its hover */
+.btn svg { transition: transform .25s var(--ease); }
+.btn--solid:hover svg { transform: translateX(4px); }
+.btn--quiet:hover svg { transform: translateY(3px); }
+
+/* --------------------------------------------------------------------------
+   BODY — one column, the form carrying the page
+   -------------------------------------------------------------------------- */
+/* no background of its own — it stands on .ground, which is what removes the
+   band edge that used to sit under the hero */
+.iwc-main { position: relative; padding: 28px 0 100px; }
+/* the same shell and gutter the hero uses, and centred to match the copy
+   block above it */
+.iwc-col {
+  width: 880px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+}
+.iwc-col > * { width: 100%; max-width: 880px; }
+
+/* card shell — same 2px corner, hairline and double shadow the home page's
+   process panel uses */
+.iwc-card {
+  background: #fff;
+  border: 1px solid #e3eaf3;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(20,40,80,.05), 0 10px 30px rgba(20,40,80,.06);
+}
+/* The form has no card of its own on this page: it sits straight on the
+   ground. .iwc-card is on the element in the shared markup, so its white
+   fill, hairline and shadow are unset here rather than the class removed —
+   that keeps this page's <main> byte-identical to option A's. */
+.iwc-card.iwc-form-card {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  scroll-margin-top: 96px;
+}
+.iwc-form-kicker {
+  font-size: 12px; font-weight: 800; letter-spacing: 1.8px; text-transform: uppercase;
+  color: #5c9a2e; margin: 0;
+}
+.iwc-form-card h2 {
+  margin: 14px 0 30px;
+  font-size: 30px; line-height: 1.22; font-weight: 800; letter-spacing: -.5px; color: #143c66;
+}
+
+/* ---------- fields ---------- */
+.iwc-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.iwc-field { margin-bottom: 20px; }
+.iwc-field > label {
+  display: block; margin-bottom: 8px;
+  font-size: 12.5px; font-weight: 800; letter-spacing: .9px; text-transform: uppercase;
+  color: #143c66;
+  transition: color .25s ease;
+}
+.iwc-req { color: #5c9a2e; margin-left: 3px; }
+.iwc-opt { color: #9aa9bc; font-weight: 700; letter-spacing: .6px; text-transform: none; margin-left: 6px; }
+.iwc-hint { margin: -2px 0 10px; font-size: 15px; line-height: 1.55; color: #5a6b82; }
+/* the no-spam line is a caveat, not instruction — it sits behind a green rule
+   so it reads as an aside rather than another thing to do */
+.iwc-hint-note {
+  margin: -2px 0 12px; padding-left: 12px;
+  border-left: 2px solid #cfe6b4;
+  font-size: 13.5px; font-style: italic; line-height: 1.5; color: #7d8ea1;
+}
+
+.iwc-input, .iwc-textarea {
+  width: 100%;
+  font-family: inherit; font-size: 16px; color: #1f2b3e;
+  background: #fbfcfe;
+  border: 1px solid #dbe4ef; border-radius: 2px;
+  transition: border-color .25s ease, box-shadow .25s ease, background .25s ease, transform .25s ease;
+}
+.iwc-input { height: 52px; padding: 0 14px; }
+.iwc-textarea { padding: 14px; min-height: 150px; line-height: 1.6; resize: vertical; }
+.iwc-input::placeholder, .iwc-textarea::placeholder { color: #9fadbf; }
+.iwc-input:hover, .iwc-textarea:hover { border-color: #c6d5e7; }
+.iwc-input:focus, .iwc-textarea:focus {
+  outline: 0; background: #fff;
+  border-color: #1266b5;
+  box-shadow: 0 0 0 3px rgba(18,102,181,.14);
+  transform: translateY(-1px);
+}
+/* :user-invalid, not :invalid — a required field shouldn't turn red before it
+   has been touched. No JS, so nothing here can get between the form and Drupal. */
+.iwc-input:user-invalid, .iwc-textarea:user-invalid {
+  border-color: #d9544d; background: #fffafa;
+}
+.iwc-input:user-invalid:focus, .iwc-textarea:user-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(217,84,77,.16);
+}
+/* the label picks up the focus ring's blue, so the eye has somewhere to land */
+.iwc-field:focus-within > label { color: #1266b5; }
+
+/* the captcha keeps its own slot: a dashed well, so the Drupal block that
+   lands here is visibly part of the form and not floating loose */
+.iwc-captcha {
+  margin: 6px 0 26px; padding: 16px 18px;
+  border: 1.5px dashed #cfdbe9; border-radius: 2px;
+  background: #f5f9fd;
+  font-size: 14px; color: #7d8ea1;
+  animation: iwcWell 5.5s ease-in-out infinite;
+}
+@keyframes iwcWell { 0%, 100% { border-color: #cfdbe9; } 50% { border-color: #bcd0e6; } }
+
+.iwc-submit {
+  display: inline-flex; align-items: center; gap: 10px;
+  height: 58px; padding: 0 34px;
+  border: 0; border-radius: 2px;
+  background: #80c34a; color: #fff;
+  font-family: inherit; font-size: 17px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(20,40,80,.14);
+}
+.iwc-submit:focus-visible { outline: 3px solid #1266b5; outline-offset: 2px; }
+.iwc-actions { display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.iwc-actions-note { margin: 0; font-size: 14.5px; color: #7d8ea1; }
+.iwc-actions-note a { color: #1266b5; font-weight: 700; }
+
+/* the form fields arrive in sequence once the card is in view */
+.iwc-anim { opacity: 0; transform: translateY(14px); }
+.iw-reveal.in .iwc-anim {
+  opacity: 1; transform: none;
+  transition: opacity .55s var(--ease) var(--d, 0s),
+              transform .55s var(--ease) var(--d, 0s);
+}
+.iw-btn svg { transition: transform .25s var(--ease); }
+.iw-btn:hover svg { transform: translateX(4px); }
+
+/* ---------- responsive ---------- */
+@media (max-width: 767px) {
+  .iwc-main { padding: 26px 0 64px; }
+  .iwc-form-card { padding: 30px 22px 28px; }
+  .iwc-form-card h2 { font-size: 25px; }
+  .iwc-row2 { grid-template-columns: 1fr; gap: 0; }
+  .iwc-proof { padding: 24px 22px; }
+  .iwc-trust { grid-template-columns: 1fr; gap: 13px; }
+  .btn { width: 100%; }
+  .btn-row { flex-direction: column; align-items: stretch; }
+  .iwc-submit { width: 100%; justify-content: center; }
+}
+
+/* --------------------------------------------------------------------------
+   STAGGER — the entrance delays, one rule per block
+   These were style="--d:.20s" on each element. Both runs are countable with
+   :nth-child because each is a complete set of siblings: the kicker and the
+   h2 are the card's first two children, the six blocks that follow are the
+   form's only children, and the five proof points are the band's only ones.
+   Delays step by .08s; if you add a block, insert a rule and renumber.
+   -------------------------------------------------------------------------- */
+.iwc-form-card > .iwc-anim:nth-child(1) { --d: .05s; }   /* kicker */
+.iwc-form-card > .iwc-anim:nth-child(2) { --d: .12s; }   /* heading */
+
+.iwc-form-card form > .iwc-anim:nth-child(1) { --d: .20s; }   /* name + company */
+.iwc-form-card form > .iwc-anim:nth-child(2) { --d: .28s; }   /* email + phone */
+.iwc-form-card form > .iwc-anim:nth-child(3) { --d: .36s; }   /* website */
+.iwc-form-card form > .iwc-anim:nth-child(4) { --d: .44s; }   /* how can we help */
+.iwc-form-card form > .iwc-anim:nth-child(5) { --d: .52s; }   /* captcha */
+.iwc-form-card form > .iwc-anim:nth-child(6) { --d: .60s; }   /* submit row */
+
+.iwc-trust > .iwc-anim:nth-child(1) { --d: .06s; }
+.iwc-trust > .iwc-anim:nth-child(2) { --d: .14s; }
+.iwc-trust > .iwc-anim:nth-child(3) { --d: .22s; }
+.iwc-trust > .iwc-anim:nth-child(4) { --d: .30s; }
+.iwc-trust > .iwc-anim:nth-child(5) { --d: .38s; }
+
+/* ---------- reduced motion ---------- */
+/* styles.css already neutralises .iw-reveal; these are this page's own. The
+   staged hero entrance is inside a no-preference query, so it never runs. */
+@media (prefers-reduced-motion: reduce) {
+  /* the washes hold at their opening positions — the ground keeps its colour,
+     it just stops moving. The sheen is motion by definition, so it goes. */
+  .hero-wash span { animation: none !important; }
+  .hero-wash::after { display: none; }
+  .hero-kicker svg, .iwc-captcha { animation: none !important; }
+  .iwc-anim { opacity: 1; transform: none; }
+  .iw-reveal.in .iwc-anim { transition: none; }
+  .btn:hover { transform: none; }
+  .btn svg, .iw-btn:hover svg { transform: none !important; }
+  .iwc-input:focus, .iwc-textarea:focus { transform: none; }
+  .iwc-trust div:hover, .iwc-trust div:hover svg { transform: none; }
+}
